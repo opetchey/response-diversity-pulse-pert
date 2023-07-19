@@ -1,0 +1,217 @@
+---
+title: "workflow for testing community properties with pulse pertubation compared to control"
+author: "Shyamolina"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  bookdown::html_document2:
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+    code_folding: hide
+
+---
+
+```{r include = FALSE, echo = FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      include = TRUE,
+                      warning = FALSE,
+                      message = FALSE,
+                      cache = FALSE)
+```
+
+```{r echo = FALSE}
+#rm(list = ls())
+options(scipen = 1, digits = 3) #set to two decimal 
+library(here)
+library(tidyverse)
+library(gridExtra)
+source(here("R", "mtime.R"))
+seed<-101
+```
+
+```{r try-mod, echo=T}
+source(here("R/simulator_lv.R"))
+```
+
+```{r default-params, echo=F}
+S <- 16 # species richness
+a_b <- 3 
+a_d <- 0.01
+s <- 1 # spread parameter in birth function
+z <- 0.05
+alpha_ij_mean <- 0.5 # competition coefficients should be in between 0 to 1
+alpha_ij_sd <- 0.1
+intrafactor <- 1
+bet<-delt<-0.001
+b_opt_mean_treatment <- seq(from=15, to=25, by=2)
+b_opt_range_treatment <- seq(from=3, to=7, by=1)
+num_replicates <- 3; rep_names <- paste0("rep-", 1:num_replicates)
+```
+
+```{r make-community-fn, echo=F}
+make_a_community <- function(S,
+                             a_b,
+                             b_opt_mean,
+                             b_opt_range,
+                             s,
+                             a_d,
+                             z,
+                             alpha_ij_mean,
+                             alpha_ij_sd,
+                             intrafactor, bet, delt){
+  
+  a_b_i <- rep(a_b, S)
+  
+  b_opt_i <- runif(S, min= b_opt_mean - (0.5*b_opt_range), 
+                   max = b_opt_mean + (0.5*b_opt_range))
+  
+  s_i <- rep(s, S)
+  
+  a_d_i <- rep(a_d, S)
+  
+  z_i <- rep(z, S)
+  
+  temp <- rnorm(S*S,
+                mean = alpha_ij_mean,
+                sd = alpha_ij_sd)
+  alpha_ij <- matrix(temp, S, S)
+  diag(alpha_ij)<-1# see the change - I put the diag term intra specific competition 1 so that it would be always higher than the interspecific competition
+  diag(alpha_ij) <- diag(alpha_ij) * intrafactor # intrafactor currently set as 1
+  
+  community_pars_object <- list(S = S,
+                           a_b_i = a_b_i,
+                           b_opt_i = b_opt_i,
+                           s_i = s_i,
+                           a_d_i = a_d_i,
+                           z_i = z_i,
+                           alpha_ij = alpha_ij, bet=bet, delt=delt)
+  
+  community_pars_object
+}
+```
+
+```{r temperature-treatment, echo=F}
+temperature_control <- 22
+temperature_pulse <- 18
+duration_pulse <- 5
+before_pulse <- 1000
+after_pulse <- 1000
+temperature_treatments <- tibble(
+  time = seq(0, before_pulse + duration_pulse + after_pulse, 1),
+  temperature_control1 = rep(temperature_control, (before_pulse + duration_pulse + after_pulse + 1)),
+  temperature_pulse1 = c(rep(temperature_control, before_pulse + 1),
+                       rep(temperature_pulse, duration_pulse),
+                       rep(temperature_control, after_pulse))) %>%
+  rename(temperature_control = temperature_control1,
+         temperature_pulse = temperature_pulse1)
+```
+
+```{r create-com-input-param, echo=F}
+set.seed(seed)
+expt <- expand.grid(b_opt_mean = b_opt_mean_treatment,
+                 b_opt_range = b_opt_range_treatment,
+                 rep_names = rep_names)
+expt <- expt %>%
+  mutate(Community_Id = paste0("Comm-", 1:nrow(expt)))
+
+community_object <- expt %>%
+  rowwise(Community_Id) %>%
+  do(community_object = make_a_community(S = S,
+                             a_b = a_b,
+                             b_opt_mean = .$b_opt_mean,
+                             b_opt_range = .$b_opt_range,
+                             s = s,
+                             a_d = a_d,
+                             z = z,
+                             alpha_ij_mean = alpha_ij_mean,
+                             alpha_ij_sd = alpha_ij_sd,
+                             intrafactor = intrafactor, bet=bet, delt=delt))
+expt <- cbind(expt, community_object)
+```
+
+```{r simulate-data-control, echo=F, cache=T, cache.extra=list(seed,expt,temperature_treatments,mtime(here("R/simulator_lv.R")))}
+
+set.seed(seed)
+Tcel_control<-temperature_treatments$temperature_control
+Time<-temperature_treatments$time
+nrun<-nrow(expt)
+res<-data.frame(Community_ID=expt$Community_Id,B_opts = NA*numeric(nrun),
+                Other_species_pars = NA*numeric(nrun),
+                Replicate_ID = expt$rep_names,Treatment = "Control",
+                Time=NA,
+                Temperature =NA,
+                Species_ID=NA,
+                Abundance = NA)
+
+res$Time<-I(list(Time))
+res$Temperature<-I(list(Tcel_control))
+
+Tcel_controlm<-matrix(Tcel_control,nrow=1)
+
+for(i in 1:nrun){
+  input<-expt$community_object[[i]]
+  spts<-simulator_lv(input_com_params = input, TcelSeries=Tcel_controlm)
+  
+  oth<-input
+  oth[["b_opt_i"]]<-NULL
+  oth$bopt_mean<-expt$b_opt_mean[i]
+  oth$bopt_range<-expt$b_opt_range[i]
+  res$Other_species_pars[i]<-I(list(oth))
+  
+  res$B_opts[i]<-I(list(input$b_opt_i))
+  res$Abundance[i]<-I(list(spts))
+}
+res$Species_ID<-I(list(colnames(spts)))
+saveRDS(res, here("Results/res_control.RDS"))
+```
+
+```{r simulate-data-pert, echo=F, cache=T, cache.extra=list(seed,expt,temperature_treatments,mtime(here("R/simulator_lv.R")))}
+
+set.seed(seed)
+Tcel_pert<-temperature_treatments$temperature_pulse
+Time<-temperature_treatments$time
+nrun<-nrow(expt)
+res<-data.frame(Community_ID=expt$Community_Id,B_opts = NA*numeric(nrun),
+                Other_species_pars = NA*numeric(nrun),
+                Replicate_ID = expt$rep_names,Treatment = "Perturbed",
+                Time=NA,
+                Temperature =NA,
+                Species_ID=NA,
+                Abundance = NA)
+
+res$Time<-I(list(Time))
+res$Temperature<-I(list(Tcel_pert))
+
+Tcel_pertm<-matrix(Tcel_pert,nrow=1)
+
+for(i in 1:nrun){
+  input<-expt$community_object[[i]]
+  spts<-simulator_lv(input_com_params = input, TcelSeries=Tcel_pertm)
+  
+  oth<-input
+  oth[["b_opt_i"]]<-NULL
+  oth$bopt_mean<-expt$b_opt_mean[i]
+  oth$bopt_range<-expt$b_opt_range[i]
+  res$Other_species_pars[i]<-I(list(oth))
+  
+  res$B_opts[i]<-I(list(input$b_opt_i))
+  res$Abundance[i]<-I(list(spts))
+}
+res$Species_ID<-I(list(colnames(spts)))
+saveRDS(res, here("Results/res_perturbed.RDS"))
+```
+
+```{r allres, echo=F, cache=T, cache.extra=list(mtime(here("R/res_control.RDS")),mtime(here("R/res_perturbed.RDS")))}
+resc<-readRDS(here("Results/res_control.RDS"))
+resp<-readRDS(here("Results/res_perturbed.RDS"))
+allres<-rbind(resc,resp)
+allres<-as_tibble(allres)
+saveRDS(allres,here("Results/res_treatments.RDS"))
+```
+
+```{r see-allres, echo=T}
+print(allres, n=3, max_extra_cols=9)
+```
+
+
