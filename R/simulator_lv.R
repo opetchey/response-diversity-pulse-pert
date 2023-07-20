@@ -21,7 +21,9 @@ library(dirmult)
 # Output:
 #   a data frame with species abundance along columns
 
-simulator_lv<-function(input_com_params, TcelSeries){
+simulator_lv<-function(input_com_params,
+                       TcelSeries,
+                       initial_abundances){
   
   S<-input_com_params$S
   al<-input_com_params$alpha_ij
@@ -30,8 +32,8 @@ simulator_lv<-function(input_com_params, TcelSeries){
   ab<-input_com_params$a_b_i
   ad<-input_com_params$a_d_i
   z<-input_com_params$z_i
-  bet<-input_com_params$bet
-  delt<-input_com_params$delt
+  
+  bet<-delt<-0.001
   
   tot_time<-ncol(TcelSeries)
   #TcelSeries<-temperature_treatments$temperature_pulse
@@ -41,7 +43,7 @@ simulator_lv<-function(input_com_params, TcelSeries){
   # initialization
   TimeSeries <- matrix(0, nrow=S,ncol= tot_time+1)# species along row
   # initial number of individuals
-  NiTh <- (rdirichlet(1, rep(1, S))*1000)[1,] # initial value of abundance
+  NiTh <- initial_abundances # initial value of abundance
   TimeSeries[,1] <- NiTh 
   
   t <- 1
