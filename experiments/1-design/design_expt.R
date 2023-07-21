@@ -11,8 +11,8 @@ library(patchwork)
 source(here("R/make a community.r"))
 
 ## define the experimental treatments ----
-b_opt_mean_treatment <- 19 # seq(15, 25, 2)
-b_opt_range_treatment <- 4 # seq(3, 7, 1)
+b_opt_mean_treatment <- seq(15, 25, 2)
+b_opt_range_treatment <- c(5) # seq(3, 7, 1)
 num_replicates <- 1; rep_names <- paste0("rep-", 1:num_replicates)
 
 ## make experiment ----
@@ -20,10 +20,11 @@ expt <- expand.grid(b_opt_mean = b_opt_mean_treatment,
                     b_opt_range = b_opt_range_treatment,
                     rep_names = rep_names)
 expt <- expt %>%
-  mutate(community_id = paste0("Comm-", 1:nrow(expt)))
+  mutate(community_id = paste0("Comm-", 1:nrow(expt)),
+         case_id = paste(community_id, rep_names, sep = "-"))
 
 ## make communities ----
-S <- 6
+S <- 10
 a_b <- 3
 s <- 1
 a_d <- 0 # 0.01
@@ -45,7 +46,7 @@ community_object <- expt %>%
                                          alpha_ij_sd = alpha_ij_sd,
                                          intrafactor = intrafactor))
 expt <- cbind(expt, community_object)
-saveRDS(expt, here("experiments/1-design/expt_communities.RDS"))
+saveRDS(expt, here("data/expt_communities.RDS"))
 
 
 ## Create the perturbation treatment ----
@@ -68,4 +69,10 @@ temperature_treatments <- tibble(
 #  ggplot(aes(x = time, y = temperature, col = treatment_level)) +
 #  geom_line()
 
-saveRDS(temperature_treatments, here("experiments/1-design/temperature_treatments.RDS"))
+saveRDS(temperature_treatments, here("data/temperature_treatments.RDS"))
+
+
+
+
+
+

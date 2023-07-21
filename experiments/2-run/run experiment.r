@@ -19,8 +19,8 @@ set.seed(seed)
 
 ## read in experimental design
 ## Created by code in "design_expt.r" script in the experiments/1-design folder
-expt <- readRDS("experiments/1-design/expt_communities.RDS")
-temperature_treatments <- readRDS("experiments/1-design/temperature_treatments.RDS")
+expt <- readRDS("data/expt_communities.RDS")
+temperature_treatments <- readRDS("data/temperature_treatments.RDS")
 
 
 ## run experiment ----
@@ -28,6 +28,7 @@ Tcel_control<-temperature_treatments$temperature_control
 Time<-temperature_treatments$time
 nrun<-nrow(expt)
 control_res<-data.frame(community_id = expt$community_id,
+                        case_id = expt$case_id,
                 B_opts = NA*numeric(nrun),
                 Other_species_pars = NA*numeric(nrun),
                 Replicate_ID = expt$rep_names,
@@ -45,6 +46,7 @@ Tcel_pert<-temperature_treatments$temperature_pulse
 Time<-temperature_treatments$time
 nrun<-nrow(expt)
 perturbed_res<-data.frame(community_id=expt$community_id,
+                          case_id = expt$case_id,
                           B_opts = NA*numeric(nrun),
                           Other_species_pars = NA*numeric(nrun),
                           Replicate_ID = expt$rep_names,Treatment = "Perturbed",
@@ -58,7 +60,7 @@ perturbed_res$Temperature<-I(list(Tcel_pert))
 
 Tcel_pertm<-matrix(Tcel_pert,nrow=1)
 
-
+#plot(t(Tcel_pertm))
 
 for(i in 1:nrun){
 
@@ -110,17 +112,18 @@ allres <- expt %>%
 
 
 community_pars <- allres %>%
-  select(community_id, b_opt_mean, b_opt_range, B_opts, Other_species_pars, Replicate_ID) %>%
+  select(community_id, case_id, b_opt_mean, b_opt_range, B_opts, Other_species_pars, Replicate_ID) %>%
   unique()
 dynamics <- allres %>%
-  select(community_id, Replicate_ID, b_opt_mean, b_opt_range, Treatment, Time,
+  select(community_id, Replicate_ID, case_id, b_opt_mean, b_opt_range, Treatment, Time,
          Temperature, Species_ID, Abundance)
 
 
 for(i in 1:nrow(dynamics)) {
   #i <- 1
   temp1 <- tibble(community_id = rep(dynamics$community_id[i], length(dynamics$Time[i][[1]])),
-                  Replicate_ID = rep(dynamics$Replicate_ID[i], length(dynamics$Time[i][[1]])),
+                  replicate_id = rep(dynamics$Replicate_ID[i], length(dynamics$Time[i][[1]])),
+                  case_id = rep(dynamics$case_id[i], length(dynamics$Time[i][[1]])),
                   b_opt_mean = rep(dynamics$b_opt_mean[i], length(dynamics$Time[i][[1]])),
                   b_opt_range = rep(dynamics$b_opt_range[i], length(dynamics$Time[i][[1]])),
                   Treatment = rep(dynamics$Treatment[i], length(dynamics$Time[i][[1]])),
@@ -144,5 +147,5 @@ dynamics_long <- dynamics_long %>%
 ## save the results
 all_results <- list(community_pars = community_pars,
                     dynamics_long = dynamics_long)
-saveRDS(all_results, here("data/all_results.RDS"))
+saveRDS(all_results, here("data/sim_results.RDS"))
 

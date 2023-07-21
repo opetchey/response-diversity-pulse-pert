@@ -1,0 +1,426 @@
+---
+title: "Response diversity and stability in the context of a pulse perturbation"
+editor: visual
+execute: 
+  echo: true
+  message: false
+  warning: false
+format:
+  html:
+    code-fold: false
+    code-summary: "Show the code"
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    toc-expand: true
+---
+
+```{r}
+#| echo: false
+library(tidyverse)
+library(readxl)
+library(here)
+library(kableExtra)
+library(patchwork)
+
+source(here("r/intrinsic_growth_rate.r"))
+```
+
+# Introduction
+
+In the context of a pulse perturbation:
+
+* will response diversity measured according to Ross et al (2023) predict community stability?
+* is there an alternate measure of response diversity that better predicts community stability?
+
+We explore these questions using a simulation model of a multispecies competition model, in which species intrinsic growth rate is a bell-shaped function of temperature, and each species can have a different temperature optimum. A pulse perturbation is created by briefly setting temperature lower than the control temperature, and then returning it to control temperature.
+
+# Methods
+
+## The multispecies model
+
+...to be completed...
+
+The following need to be specified for a community (in addition to the number of species):
+
+```{r}
+#| echo: false
+species_and_community_properties <- read_excel(here("experiments/1-design/species_and_community_properties.xlsx"))
+species_and_community_properties %>% 
+  kbl() %>%
+  kable_styling()
+```
+
+## Experimental treatments
+
+### Pulse pertubation treatment
+
+Temperature is constant in one treatment, and is pulse perturbed in another. For simplicity, we always make the perturbed temperature lower than the control temperature.
+
+```{r}
+#| echo: false
+temperature_treatments <- readRDS(here("data/temperature_treatments.RDS"))
+temperature_treatments |>
+  filter(time > 9900) |> 
+  ggplot(aes(x = time)) +
+  geom_line(aes(y = temperature_control), col="black", linewidth = 3) +
+  geom_line(aes(y = temperature_pulse), col="red", linewidth = 1)
+  
+```
+
+### Community composition treatment
+
+We manipulate the composition of the communities by changing the distributions from which parameter values are drawn. For example, the optimum temperature for growth for each species are drawn from a uniform distribution; we make a set of communities that vary in the mean and in the range of this uniform distribution.
+
+For examples, here is a community with **little** interspecific variation in optimum temperature. Vertical lines show the control and perturbation temperature specified in the experimental design:
+
+```{r}
+#| echo: false
+## read in experimental design
+## Created by code in "design_expt.r" script in the experiments/1-design folder
+expt <- readRDS(here("data/expt_communities.RDS"))
+temperature_treatments <- readRDS(here("data/temperature_treatments.RDS"))
+
+min_temperature <- min(c(temperature_treatments$temperature_control,
+                       temperature_treatments$temperature_pulse))
+max_temperature <- max(c(temperature_treatments$temperature_control,
+                       temperature_treatments$temperature_pulse))
+min_max_temps <- tibble(temperature = c(min_temperature, max_temperature),
+                        y = c(0,0))
+buffer <- (max_temperature - min_temperature ) / 5
+temperatures <- seq(min_temperature - buffer, max_temperature + buffer, 0.1)
+
+cases <- unique(expt$case_id)
+coi <- cases[1]
+temp <- expt |>
+  dplyr::filter(case_id == coi)
+#temp$community_object
+b_opt_i <- temp$community_object[[1]]$b_opt_i
+a_b_i <- temp$community_object[[1]]$a_b_i
+s_i <- temp$community_object[[1]]$s_i
+a_d_i <- temp$community_object[[1]]$a_d_i
+z_i <- temp$community_object[[1]]$z_i
+#alpha_ij <- temp$community_object[[1]]$alpha_ij
+
+## for each species do all temps
+for(i in 1:length(b_opt_i)) {
+  
+  species_pars <- list(b_opt_i = b_opt_i[i],
+                       a_b_i = a_b_i[i],
+                       s_i = s_i[i],
+                       a_d_i = a_d_i[i],
+                       z_i = z_i[i])
+
+  rates <- intrinsic_growth_rate(species_pars = species_pars,
+                        temperature = temperatures)
+  
+  if(i == 1)
+    resp_curves <- tibble(species_id = paste0("Spp-", i),
+                          temperature = temperatures,
+                          intrinsic_growth_rate = rates)
+  if(i > 1)
+    resp_curves <- rbind(resp_curves,
+                         tibble(species_id = paste0("Spp-", i),
+                                temperature = temperatures,
+                          intrinsic_growth_rate = rates))
+    
+}
+
+resp_curves |> 
+ggplot(aes(x = temperature, y = intrinsic_growth_rate)) +
+  geom_line() +
+  facet_grid(rows = vars(species_id)) +
+  geom_vline(xintercept = c(min_temperature, max_temperature)) +
+  ggtitle(paste(coi, paste(round(b_opt_i,1), collapse = ", "), sep = " :: ")) 
+
+```
+
+For examples, here is a community with more interspecific variation in optimum temperature. Vertical lines show the control and perturbation temperature specified in the experimental design:
+
+```{r}
+#| echo: false
+## read in experimental design
+## Created by code in "design_expt.r" script in the experiments/1-design folder
+expt <- readRDS(here("data/expt_communities.RDS"))
+temperature_treatments <- readRDS(here("data/temperature_treatments.RDS"))
+
+min_temperature <- min(c(temperature_treatments$temperature_control,
+                       temperature_treatments$temperature_pulse))
+max_temperature <- max(c(temperature_treatments$temperature_control,
+                       temperature_treatments$temperature_pulse))
+min_max_temps <- tibble(temperature = c(min_temperature, max_temperature),
+                        y = c(0,0))
+buffer <- (max_temperature - min_temperature ) / 5
+temperatures <- seq(min_temperature - buffer, max_temperature + buffer, 0.1)
+
+cases <- unique(expt$case_id)
+coi <- cases[2]
+temp <- expt |>
+  dplyr::filter(case_id == coi)
+#temp$community_object
+b_opt_i <- temp$community_object[[1]]$b_opt_i
+a_b_i <- temp$community_object[[1]]$a_b_i
+s_i <- temp$community_object[[1]]$s_i
+a_d_i <- temp$community_object[[1]]$a_d_i
+z_i <- temp$community_object[[1]]$z_i
+#alpha_ij <- temp$community_object[[1]]$alpha_ij
+
+## for each species do all temps
+for(i in 1:length(b_opt_i)) {
+  
+  species_pars <- list(b_opt_i = b_opt_i[i],
+                       a_b_i = a_b_i[i],
+                       s_i = s_i[i],
+                       a_d_i = a_d_i[i],
+                       z_i = z_i[i])
+
+  rates <- intrinsic_growth_rate(species_pars = species_pars,
+                        temperature = temperatures)
+  
+  if(i == 1)
+    resp_curves <- tibble(species_id = paste0("Spp-", i),
+                          temperature = temperatures,
+                          intrinsic_growth_rate = rates)
+  if(i > 1)
+    resp_curves <- rbind(resp_curves,
+                         tibble(species_id = paste0("Spp-", i),
+                                temperature = temperatures,
+                          intrinsic_growth_rate = rates))
+    
+}
+
+resp_curves |> 
+ggplot(aes(x = temperature, y = intrinsic_growth_rate)) +
+  geom_line() +
+  facet_grid(rows = vars(species_id)) +
+  geom_vline(xintercept = c(min_temperature, max_temperature)) +
+  ggtitle(paste(coi, paste(round(b_opt_i,1), collapse = ", "), sep = " :: ")) 
+
+```
+
+
+
+### Strength of species interactions treatment
+
+... to be done ...
+
+
+## Analyses
+
+### Species response traits
+
+We calculated two types of species response trait. First was a response trait based on the temperature response curve of a species. For this trait, we calculated the effect of the perturbation on intrinsic growth rate (perturbation temperature intrinsic growth rate - control temperature intrinsic growth rate).
+
+```{r}
+#| echo: false
+#| eval: false
+resp_curves_2 <- resp_curves |> 
+  filter(temperature == min_temperature | temperature == max_temperature) |> 
+  pivot_wider(names_from = temperature, values_from = intrinsic_growth_rate,
+              names_prefix = "temp") |> 
+  mutate(igr_pert_effect = temp15 - temp22) |> 
+  select(species_id, igr_pert_effect)
+
+resp_curves_2 %>% 
+  kbl() %>%
+  kable_styling()
+```
+
+Second was a response trait based on the observed response of the species to the pulse pertubation in the community context. Hence this response trait depends on the direct effect of the pulse on a species, and also the indirect effects via other species in the community.
+
+### Community response diversity
+
+*For the moment we don't calculate the response diversity, but rather then mean of the response trait values and the variance of the response trait values of the species in a community. Maybe we see enough with that, maybe we benefit from using a measure of response diversity.*
+
+### Community stability
+
+This was calculated as the effect of the pulse perturbation on the total community biomass. Specifically the area between the control and perturbed dynamics.
+
+
+
+
+# Results
+
+## Example of a single community
+
+Here in the top row is a panel for each species, with the control and the pulse perturbed dynamics. Bottom row is the difference between the perturbed and control treatment.
+
+```{r}
+#| echo: false
+temp <- readRDS(here("data/sim_results.RDS"))
+#temp <- readRDS(here("data/sim_results.RDS"))
+
+community_pars <- temp$community_pars
+dynamics <- temp$dynamics_long
+
+## Look at some of the species level data
+cases <- unique(dynamics$case_id)
+
+case_of_interest <- cases[1] 
+p1 <- dynamics |>
+  filter(case_id == case_of_interest) |>
+  select(case_id, Species_ID, Time, Treatment, Abundance) |> 
+  ggplot(aes(x = Time, y = Abundance,
+             col = Species_ID, linetype = Treatment)) +
+  #geom_point() +
+  geom_line() +
+  ggtitle(paste(case_of_interest)) +
+  facet_wrap(~ Species_ID, nrow = 3, scales = "free_y") 
+p1
+#p2 <- species_time_stab |>
+#  filter(case_id == case_of_interest) |> 
+#  ggplot(aes(x = Time, y = spp_deltabm, col = Species_ID)) +
+#  #geom_point() +
+#  geom_line() +
+#  geom_hline(yintercept = 0) +
+#  ggtitle(paste(case_of_interest)) +
+#  facet_wrap(~ Species_ID, nrow = 1, scales = "free_y") 
+#p1 / p2
+```
+
+Here are the corresponding species response traits in this case:
+
+```{r}
+#| echo: false
+species_response_traits <- readRDS(here("data/species_measures.RDS"))
+species_response_traits %>% 
+  filter(case_id == case_of_interest) |>
+  select(species_id, species_tot_deltabm, igr_pert_effect) |> 
+  kbl() %>%
+  kable_styling()
+```
+
+And the total biomass dynamics:
+
+```{r}
+comm_time_stab <- dynamics |>
+  ## remove rows where biomass is 0 in both control and treatment
+  #filter((Con.M + Dist.M) != 0) |>
+  group_by(case_id, community_id, replicate_id, Time, Treatment) %>%
+  summarise(tot_ab = sum(Abundance, na.rm = T)) %>%
+  pivot_wider(names_from = Treatment, values_from = tot_ab) %>%
+  mutate(comm_LRR = log(Perturbed / Control),
+         comm_deltabm = (Perturbed - Control) /
+           (Perturbed + Control))
+```
+
+```{r}
+p1 <- comm_time_stab |>
+  filter(case_id == case_of_interest) |> 
+  ggplot(aes(x = Time)) +
+  geom_line(aes(y = Control), col = "black", linewidth = 3) +
+  geom_line(aes(y = Perturbed), col = "red", linewidth = 1) +
+  ylab("Total abundance")
+
+p2 <- comm_time_stab |>
+  filter(case_id == case_of_interest) |> 
+  ggplot(aes(x = Time)) +
+  geom_line(aes(y = comm_LRR))
+
+p3 <- comm_time_stab |>
+  filter(case_id == case_of_interest) |> 
+  ggplot(aes(x = Time)) +
+  geom_line(aes(y = comm_deltabm))
+p1 / p2 / p3
+```
+
+
+
+## Example of a single community
+
+Here in the top row is a panel for each species, with the control and the pulse perturbed dynamics. Bottom row is the difference between the perturbed and control treatment.
+
+```{r}
+#| echo: false
+temp <- readRDS(here("data/sim_results.RDS"))
+#temp <- readRDS(here("data/sim_results.RDS"))
+
+community_pars <- temp$community_pars
+dynamics <- temp$dynamics_long
+
+## Look at some of the species level data
+cases <- unique(dynamics$case_id)
+
+case_of_interest <- cases[2] 
+p1 <- dynamics |>
+  filter(case_id == case_of_interest) |>
+  select(case_id, Species_ID, Time, Treatment, Abundance) |> 
+  ggplot(aes(x = Time, y = Abundance,
+             col = Species_ID, linetype = Treatment)) +
+  #geom_point() +
+  geom_line() +
+  ggtitle(paste(case_of_interest)) +
+  facet_wrap(~ Species_ID, nrow = 3, scales = "free_y") 
+p1
+#p2 <- species_time_stab |>
+#  filter(case_id == case_of_interest) |> 
+#  ggplot(aes(x = Time, y = spp_deltabm, col = Species_ID)) +
+#  #geom_point() +
+#  geom_line() +
+#  geom_hline(yintercept = 0) +
+#  ggtitle(paste(case_of_interest)) +
+#  facet_wrap(~ Species_ID, nrow = 1, scales = "free_y") 
+#p1 / p2
+```
+
+Here are the corresponding species response traits in this case:
+
+```{r}
+#| echo: false
+species_response_traits <- readRDS(here("data/species_measures.RDS"))
+species_response_traits %>% 
+  filter(case_id == case_of_interest) |>
+  select(species_id, species_tot_deltabm, igr_pert_effect) |> 
+  kbl() %>%
+  kable_styling()
+```
+
+```{r}
+p1 <- comm_time_stab |>
+  filter(case_id == case_of_interest) |> 
+  ggplot(aes(x = Time)) +
+  geom_line(aes(y = Control), col = "black", linewidth = 3) +
+  geom_line(aes(y = Perturbed), col = "red", linewidth = 1) +
+  ylab("Total abundance")
+
+p2 <- comm_time_stab |>
+  filter(case_id == case_of_interest) |> 
+  ggplot(aes(x = Time)) +
+  geom_line(aes(y = comm_LRR))
+
+p3 <- comm_time_stab |>
+  filter(case_id == case_of_interest) |> 
+  ggplot(aes(x = Time)) +
+  geom_line(aes(y = comm_deltabm))
+p1 / p2 / p3
+```
+
+
+## Response diversity and community stability
+
+```{r}
+#| echo: false
+comm_all <- readRDS(here("data/community_measures.RDS"))
+
+
+comm_all |> 
+  ggplot(aes(x = mean_spp_deltabm, y = comm_tot_deltabm, col = case_id)) +
+  geom_point()
+
+comm_all |> 
+  ggplot(aes(x = mean_igr_effect, y = comm_tot_deltabm, col = case_id)) +
+  geom_point()
+
+
+comm_all |> 
+  ggplot(aes(x = mean_spp_deltabm, y = OEV, col = case_id)) +
+  geom_point()
+
+comm_all |> 
+  ggplot(aes(x = mean_igr_effect, y = OEV, col = case_id)) +
+  geom_point()
+
+
+```
+
+
