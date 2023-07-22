@@ -8,16 +8,20 @@ library(here)
 library(kableExtra)
 library(patchwork)
 
-source(here("R/make a community.r"))
+source(here("R/make a community.R"))
 
 ## define the experimental treatments ----
-b_opt_mean_treatment <- seq(15, 25, 2)
+b_opt_mean_treatment <- seq(18, 20, 1)
 b_opt_range_treatment <- c(5) # seq(3, 7, 1)
+alpha_ij_mean_treatment <- c(0)
+alpha_ij_sd_treatment <- c(0, 0.2)
 num_replicates <- 1; rep_names <- paste0("rep-", 1:num_replicates)
 
 ## make experiment ----
 expt <- expand.grid(b_opt_mean = b_opt_mean_treatment,
                     b_opt_range = b_opt_range_treatment,
+                    alpha_ij_mean = alpha_ij_mean_treatment,
+                    alpha_ij_sd = alpha_ij_sd_treatment,
                     rep_names = rep_names)
 expt <- expt %>%
   mutate(community_id = paste0("Comm-", 1:nrow(expt)),
@@ -29,8 +33,8 @@ a_b <- 3
 s <- 1
 a_d <- 0 # 0.01
 z <- 0.05
-alpha_ij_mean <- 0 # 0.5
-alpha_ij_sd <- 0 #0.1
+#alpha_ij_mean <- 0 # 0.5
+#alpha_ij_sd <- 0 #0.1
 intrafactor <- 1
 community_object <- expt %>%
   rowwise(community_id) %>%
@@ -42,8 +46,8 @@ community_object <- expt %>%
                                          s = s,
                                          a_d = a_d,
                                          z = z,
-                                         alpha_ij_mean = alpha_ij_mean,
-                                         alpha_ij_sd = alpha_ij_sd,
+                                         alpha_ij_mean = .$alpha_ij_mean,
+                                         alpha_ij_sd = .$alpha_ij_sd,
                                          intrafactor = intrafactor))
 expt <- cbind(expt, community_object)
 saveRDS(expt, here("data/expt_communities.RDS"))
