@@ -11,6 +11,9 @@ library(patchwork)
 ## source any required user defined functions
 source(here("r/my_auc.R"))
 
+## sub-sample rate
+keep_every_t <- 20
+
 ## read data
 temp <- readRDS(here("data/sim_results.RDS"))
 community_pars <- temp$community_pars
@@ -35,8 +38,16 @@ comm_time_stab <- dynamics |>
            (Perturbed + Control))
 
 
+comm_time_stab |>
+  filter(case_id =="Comm-6-rep-1",
+        # Time > 10400, Time < 10500,
+         (Time %% keep_every_t) == 0) |> 
+  ggplot(aes(x = Time, y = comm_deltabm)) +
+  geom_line()
+
 ## And now across time points by auc
-comm_stab <- comm_time_stab |> 
+comm_stab <- comm_time_stab |>
+  filter((Time %% keep_every_t) == 0) |> 
   group_by(case_id, community_id, replicate_id) |> 
   summarise(comm_tot_deltabm = my_auc_func(Time, comm_deltabm)) |> 
   mutate(OEV = sqrt(abs(comm_tot_deltabm)))
@@ -58,6 +69,7 @@ species_time_stab <- dynamics |>
   mutate(spp_deltabm = (Perturbed - Control)/
            (Perturbed + Control))
 species_stab <- species_time_stab |>
+  filter((Time %% keep_every_t) == 0) |> 
   group_by(case_id, community_id, replicate_id, Species_ID) |> 
   summarise(species_tot_deltabm = my_auc_func(Time, spp_deltabm))
 ## AUC calculation is giving warnings when there are duplicate RD values

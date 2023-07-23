@@ -11,7 +11,7 @@ library(patchwork)
 source(here("R/make a community.R"))
 
 ## define the experimental treatments ----
-b_opt_mean_treatment <- seq(18, 20, 1)
+b_opt_mean_treatment <- seq(17, 21, 1)
 b_opt_range_treatment <- c(5) # seq(3, 7, 1)
 alpha_ij_mean_treatment <- c(0)
 alpha_ij_sd_treatment <- c(0, 0.2)
@@ -30,7 +30,7 @@ expt <- expt %>%
 ## make communities ----
 S <- 10
 a_b <- 3
-s <- 1
+s <- 10
 a_d <- 0 # 0.01
 z <- 0.05
 #alpha_ij_mean <- 0 # 0.5
