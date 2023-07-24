@@ -2,10 +2,10 @@ rm(list=ls())
 
 library(tidyverse)
 library(readxl)
-library(MESS)
+#library(MESS)
 library(here)
 library(cowplot)
-library(GGally)
+#library(GGally)
 library(patchwork)
 
 ## source any required user defined functions
