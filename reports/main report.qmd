@@ -23,7 +23,7 @@ library(here)
 library(kableExtra)
 library(patchwork)
 
-source(here("r/intrinsic_growth_rate.r"))
+source(here("R/intrinsic_growth_rate.R"))
 ```
 
 # Introduction
