@@ -2,17 +2,17 @@ rm(list=ls())
 
 library(tidyverse)
 library(readxl)
-#library(MESS)
+library(MESS)
 library(here)
-library(cowplot)
+#library(cowplot)
 #library(GGally)
 library(patchwork)
 
 ## source any required user defined functions
-source(here("r/my_auc.R"))
+source(here("R/my_auc.R"))
 
 ## sub-sample rate
-keep_every_t <- 20
+keep_every_t <- 10
 
 ## read data
 temp <- readRDS(here("data/sim_results.RDS"))
@@ -49,8 +49,10 @@ comm_time_stab |>
 comm_stab <- comm_time_stab |>
   filter((Time %% keep_every_t) == 0) |> 
   group_by(case_id, community_id, replicate_id) |> 
-  summarise(comm_tot_deltabm = my_auc_func(Time, comm_deltabm)) |> 
-  mutate(OEV = sqrt(abs(comm_tot_deltabm)))
+  summarise(comm_tot_deltabm_spline = my_auc_func_spline(Time, comm_deltabm),
+            comm_tot_deltabm_raw = my_auc_func_raw(Time, comm_deltabm)) |> 
+  mutate(OEV_spline = sqrt(abs(comm_tot_deltabm_spline)),
+         OEV_raw = sqrt(abs(comm_tot_deltabm_raw)))
 ## I would be cautious about using splines without checking they are
 ## working as expected, here, and for the species level auc calculations.
 ## They might be not very well constrained at the two ends of the RD axis,
@@ -71,7 +73,8 @@ species_time_stab <- dynamics |>
 species_stab <- species_time_stab |>
   filter((Time %% keep_every_t) == 0) |> 
   group_by(case_id, community_id, replicate_id, Species_ID) |> 
-  summarise(species_tot_deltabm = my_auc_func(Time, spp_deltabm))
+  summarise(species_tot_deltabm_spline = my_auc_func_spline(Time, spp_deltabm),
+            species_tot_deltabm_raw = my_auc_func_raw(Time, spp_deltabm))
 ## AUC calculation is giving warnings when there are duplicate RD values
 ## Need to check how important this is.
 
@@ -80,8 +83,10 @@ species_stab <- species_time_stab |>
 ## species level traits
 comm_indicies <- species_stab |> 
   group_by(community_id, replicate_id, case_id) |> 
-  summarise(mean_spp_deltabm = mean(species_tot_deltabm),
-            var_spp_deltabm = var(species_tot_deltabm))
+  summarise(mean_spp_deltabm_spline = mean(species_tot_deltabm_spline),
+            var_spp_deltabm_spline = var(species_tot_deltabm_spline),
+            mean_spp_deltabm_raw = mean(species_tot_deltabm_raw),
+            var_spp_deltabm_raw = var(species_tot_deltabm_raw))
 
 ## Calculate response diversity from response curve traits
 igr_respdiv <- species_igr_pert_effect |> 

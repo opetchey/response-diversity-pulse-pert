@@ -1,6 +1,6 @@
 ## prelims ----
 
-rm(list = ls())
+#rm(list = ls())
 
 library(tidyverse)
 library(readxl)
@@ -11,10 +11,10 @@ library(patchwork)
 source(here("R/make a community.R"))
 
 ## define the experimental treatments ----
-b_opt_mean_treatment <- seq(17, 21, 1)
+b_opt_mean_treatment <- seq(17, 21, 0.2)
 b_opt_range_treatment <- c(5) # seq(3, 7, 1)
 alpha_ij_mean_treatment <- c(0)
-alpha_ij_sd_treatment <- c(0, 0.2)
+
 num_replicates <- 1; rep_names <- paste0("rep-", 1:num_replicates)
 
 ## make experiment ----

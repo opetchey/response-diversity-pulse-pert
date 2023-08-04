@@ -6,14 +6,14 @@ library(here)
 library(tidyverse)
 library(gridExtra)
 #source(here("R", "mtime.R"))
-seed <- 101
+#seed <- 101
 
 ## source some functions ----
 source(here("R/simulator_lv.R"))
 source(here("R/make a community.R"))
 
 
-set.seed(seed)
+#set.seed(seed)
 
 
 

@@ -2,7 +2,7 @@ rm(list = ls())
 
 library(dplyr)
 
-source(here("r/intrinsic_growth_rate.r"))
+source(here("R/intrinsic_growth_rate.R"))
 
 ## read in experimental design
 ## Created by code in "design_expt.r" script in the experiments/1-design folder
