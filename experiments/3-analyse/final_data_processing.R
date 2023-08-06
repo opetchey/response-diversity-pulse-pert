@@ -82,10 +82,18 @@ comm_all <- comm_all %>%
 
 saveRDS(expt, here("data/merged/expt.RDS"))
 saveRDS(community_pars, here("data/merged/community_pars.RDS"))
-saveRDS(dynamics, here("data/merged/dynamics.RDS"))
+#saveRDS(dynamics, here("data/merged/dynamics.RDS"))
 saveRDS(species_response_traits, here("data/merged/species_response_traits.RDS"))
 saveRDS(comm_all, here("data/merged/comm_all.RDS"))
 
+
+## save dynamics as a database, since it is rather large
+library(DBI)
+library(RSQLite)
+conn <- dbConnect(RSQLite::SQLite(), here("data/merged/dynamics.db"))
+dbWriteTable(conn, "dynamics", dynamics)
+#dbListTables(conn)
+dbDisconnect(conn)
 
 ## Here the code for calculating the explanatory power ----
 

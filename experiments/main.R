@@ -1,8 +1,9 @@
 library(here)
 
 ## there is currently no random number seed set
-
-# Design experiment
+## simulations can take a few hours.
+## simulations were run in "packs", with each pack creating
+## a set of data files
 # pack1
 #alpha_ij_sd_treatment <- c(0, 0.01, 0.02, 0.05, 0.1)
 # pack2
@@ -10,7 +11,9 @@ library(here)
 # pack 3 and pack4 and pack5
 #alpha_ij_sd_treatment <- seq(0, 0.5, 0.05)
 # pack6
-alpha_ij_sd_treatment <- seq(0, 0.5, 0.025)
+#alpha_ij_sd_treatment <- seq(0, 0.5, 0.025)
+
+# Design experiment
 source(here("experiments/1-design/design_expt.R"))
 
 # Calculate perturbation effects on intrinsic growth rate
@@ -25,8 +28,5 @@ source(here("experiments/3-analyse/get_stab_and_respdiv.R"))
 # Final data processing and analyses
 source(here("experiments/3-analyse/final_data_processing.R"))
 
-
-
-# use "reports/quick look.r" to have a quick look at some results
-# use "reports/main.qmd" for more comprehensive report.
+# use "reports/main-report.qmd" to make a report containing various results.
 
