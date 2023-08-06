@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 data/
+reports/main-report_cache/
+reports/main-repott_files/
