@@ -1,6 +1,7 @@
 library(here)
 
-## there is currently no random number seed set
+## there is currently no random number seed set.
+
 ## simulations can take a few hours.
 ## simulations were run in "packs", with each pack creating
 ## a set of data files
