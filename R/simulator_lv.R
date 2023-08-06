@@ -64,9 +64,9 @@ simulator_lv<-function(input_com_params,
     
     TimeSeries[,t+1]<- Ntnext
     
-    if(any(TimeSeries[,t+1] <= 1e-4)==T) {
-      TimeSeries[which(TimeSeries[,t+1] <= 1e-4),t+1] <- 1
-    }
+    #if(any(TimeSeries[,t+1] <= 1e-4)==T) {
+    #  TimeSeries[which(TimeSeries[,t+1] <= 1e-4),t+1] <- 1
+    #}
     t <- t + 1
   }
   

@@ -78,6 +78,10 @@ for(i in 1:nrun){
                        TcelSeries = Tcel_controlm,
                        initial_abundances = initial_abundances)
   
+  #plot(t(Tcel_controlm))
+  #unique(t(Tcel_controlm))
+  #matplot(spts[6400:7000,1])
+  
   oth<-input
   oth[["b_opt_i"]]<-NULL
   oth$bopt_mean<-expt$b_opt_mean[i]
