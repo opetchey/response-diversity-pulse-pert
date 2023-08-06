@@ -6,14 +6,14 @@ library(here)
 library(tidyverse)
 library(gridExtra)
 #source(here("R", "mtime.R"))
-seed <- 101
+#seed <- 101
 
 ## source some functions ----
 source(here("R/simulator_lv.R"))
 source(here("R/make a community.R"))
 
 
-set.seed(seed)
+#set.seed(seed)
 
 
 
@@ -109,17 +109,23 @@ allres<-rbind(control_res,
 allres<-as_tibble(allres)
 
 allres <- expt %>%
-  select(community_id, b_opt_mean, b_opt_range) %>%
+  select(community_id, b_opt_mean, b_opt_range,
+         alpha_ij_mean, alpha_ij_sd) %>%
   full_join(allres, multiple = "all")
 
 
 
 
 community_pars <- allres %>%
-  select(community_id, case_id, b_opt_mean, b_opt_range, B_opts, Other_species_pars, Replicate_ID) %>%
+  select(community_id, case_id, b_opt_mean, b_opt_range,
+         B_opts,
+         alpha_ij_mean, alpha_ij_sd,
+         Other_species_pars, Replicate_ID) %>%
   unique()
 dynamics <- allres %>%
-  select(community_id, Replicate_ID, case_id, b_opt_mean, b_opt_range, Treatment, Time,
+  select(community_id, Replicate_ID, case_id, b_opt_mean, b_opt_range,
+         alpha_ij_mean, alpha_ij_sd,
+         Treatment, Time,
          Temperature, Species_ID, Abundance)
 
 
@@ -130,6 +136,8 @@ for(i in 1:nrow(dynamics)) {
                   case_id = rep(dynamics$case_id[i], length(dynamics$Time[i][[1]])),
                   b_opt_mean = rep(dynamics$b_opt_mean[i], length(dynamics$Time[i][[1]])),
                   b_opt_range = rep(dynamics$b_opt_range[i], length(dynamics$Time[i][[1]])),
+                  alpha_ij_mean = rep(dynamics$alpha_ij_mean[i], length(dynamics$Time[i][[1]])),
+                  alpha_ij_sd = rep(dynamics$alpha_ij_sd[i], length(dynamics$Time[i][[1]])),
                   Treatment = rep(dynamics$Treatment[i], length(dynamics$Time[i][[1]])),
                   Time = dynamics$Time[i][[1]],
                   Temperature = dynamics$Temperature[i][[1]])
