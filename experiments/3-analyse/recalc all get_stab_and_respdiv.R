@@ -17,6 +17,7 @@ library(patchwork)
 
 ## source any required user defined functions
 source(here("R/my_auc.R"))
+source(here("R/Ross_et_al_functions.R"))
 
 ## sub-sample rate
 keep_every_t <- 10
@@ -103,7 +104,9 @@ for(i in 1:length(packs_to_read_in)) {
   igr_respdiv <- species_igr_pert_effect |> 
     group_by(case_id) |> 
     summarise(mean_igr_effect = mean(igr_pert_effect),
-              var_igr_effect = var(igr_pert_effect))
+              var_igr_effect = var(igr_pert_effect),
+              RD_diss = resp_div(igr_pert_effect, sign_sens = FALSE),
+              RD_div = resp_div(igr_pert_effect, sign_sens = TRUE))
   
   ## merge with comm stability measures 
   comm_all <- full_join(comm_stab, comm_indicies) |> 

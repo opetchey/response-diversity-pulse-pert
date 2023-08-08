@@ -156,13 +156,16 @@ When we set $sd(alpha_{i,j})$ = 0 then there are no interspecific interactions. 
 
 ### Species response traits
 
-We calculated two types of species response trait. First was a response trait based on the temperature response curve of a species. For this trait, we calculated the effect of the perturbation on intrinsic growth rate (perturbation temperature intrinsic growth rate - control temperature intrinsic growth rate).
+We calculated two types of species response trait. First was a response trait based on the temperature response curve of a species (i.e., as in [Ross et al (2023)](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.14087)). For this trait, we calculated the effect of the perturbation on intrinsic growth rate (perturbation temperature intrinsic growth rate - control temperature intrinsic growth rate). This is analogous to the calculating the first derivative (slope) of the temperature response curve.
 
 Second was a response trait based on the observed response of the species to the pulse perturbation in the community context. Hence this response trait depends on the direct effect of the pulse on a species, and also the indirect effects via other species in the community.
 
 ### Community response diversity
 
-*For the moment we don't calculate the response diversity, but rather then mean of the response trait values and the variance of the response trait values of the species in a community. Maybe we see enough with that, maybe we benefit from using a measure of response diversity.*
+Currently we calculate:
+
+* IGR-effect trait mean, variance, dissimilarity response diversity, and divergence response diversity.
+* Species AUC trait mean and variance.
 
 ### Community stability
 
@@ -249,7 +252,8 @@ comm_all |>
   ggplot(aes(x = mean_spp_deltabm_spline, y = OEV_spline)) +
   geom_point() +
   facet_wrap(vars(alpha_ij_sd), ncol = 3, scales = "free_y") +
-  theme(legend.position="none")
+  theme(legend.position="none") +
+  ggtitle("Realised niche-based response trait, with OEV = sqrt(abs(comm_auc))")
 
 ```
 
@@ -260,10 +264,33 @@ comm_all |>
   ggplot(aes(x = mean_igr_effect, y = OEV_spline)) +
   geom_point() +
   facet_wrap(vars(alpha_ij_sd), ncol = 3, scales = "free_y")  +
-  theme(legend.position="none")
-
-
+  theme(legend.position="none") +
+  ggtitle("Fundamental niche-based response trait, with OEV = sqrt(abs(comm_auc))")
 ```
+
+```{r}
+#| echo: false
+#| eval: false
+comm_all |> 
+  ggplot(aes(x = RD_diss, y = OEV_spline)) +
+  geom_point() +
+  facet_wrap(vars(alpha_ij_sd), ncol = 4, scales = "free_y")  +
+  theme(legend.position="none") +
+  ggtitle("Fundamental niche-based response trait (RD_diss), with OEV = sqrt(abs(comm_auc))")
+```
+
+```{r}
+#| echo: false
+#| eval: false
+comm_all |> 
+  ggplot(aes(x = RD_div, y = OEV_spline)) +
+  geom_point() +
+  facet_wrap(vars(alpha_ij_sd), ncol = 4, scales = "free_y")  +
+  theme(legend.position="none") +
+  ggtitle("Fundamental niche-based response trait (RD_div), with OEV = sqrt(abs(comm_auc))")
+```
+
+
 
 ## Some individual communities
 
@@ -381,7 +408,7 @@ species_response_traits |>
   ggplot(aes(x = igr_pert_effect,
              y = species_tot_deltabm_spline)) +
   geom_point() +
-  facet_wrap(vars(alpha_ij_sd), nrow = 2) +
+  facet_wrap(vars(alpha_ij_sd), nrow = 4) +
   theme(legend.position="none")
 ```
 
@@ -391,7 +418,7 @@ species_response_traits |>
   ggplot(aes(x = species_tot_deltabm_raw,
              y = species_tot_deltabm_spline)) +
   geom_point() +
-  facet_wrap(vars(alpha_ij_sd), nrow = 2) +
+  facet_wrap(vars(alpha_ij_sd), nrow = 4) +
   theme(legend.position="none")
 ```
 
@@ -401,6 +428,27 @@ comm_all |>
   ggplot(aes(x = comm_tot_deltabm_raw,
              y = comm_tot_deltabm_spline)) +
   geom_point() +
-  facet_wrap(vars(alpha_ij_sd), nrow = 2) +
+  facet_wrap(vars(alpha_ij_sd), nrow = 4) +
   theme(legend.position="none")
 ```
+
+```{r}
+#| echo: false
+comm_all |> 
+  ggplot(aes(x = mean_igr_effect,
+             y = RD_diss)) +
+  geom_point() +
+  facet_wrap(vars(alpha_ij_sd), nrow = 4) +
+  theme(legend.position="none")
+```
+
+```{r}
+#| echo: false
+comm_all |> 
+  ggplot(aes(x = mean_igr_effect,
+             y = RD_div)) +
+  geom_point() +
+  facet_wrap(vars(alpha_ij_sd), nrow = 4) +
+  theme(legend.position="none")
+```
+
