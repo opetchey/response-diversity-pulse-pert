@@ -164,12 +164,12 @@ Second was a response trait based on the observed response of the species to the
 
 Currently we calculate:
 
-* IGR-effect trait mean, variance, dissimilarity response diversity, and divergence response diversity.
-* Species AUC trait mean and variance.
+-   IGR-effect trait mean, variance, dissimilarity response diversity, and divergence response diversity.
+-   Species AUC trait mean and variance.
 
 ### Community stability
 
-This was calculated as the effect of the pulse perturbation on the total community biomass. Specifically the area between the control and perturbed dynamics.
+This was calculated as the effect of the pulse perturbation on the total community biomass. Specifically the area between the control and perturbed dynamics. Stability is greatest when this is zero. More negative and more positive values imply lower stability. To make a measure of stability, we take the absolute value of this. Both the actual value and the absolute are used below, in different settings.
 
 # Results
 
@@ -190,23 +190,98 @@ And here we show how much variability in community stability is explained by the
 
 ```{r}
 #| echo: false
-
+expl_all_long <- expl_all %>%
+  pivot_longer(names_to = "variable", values_to = "rsq", cols = 3:14) %>%
+  separate(variable, into = c("junk1", "commstab_type", "trait_type", "summary_type", "summary_subtype")) %>%
+  select(-junk1)
 ```
 
 ```{r}
 #| echo: false
-expl_all %>%
-  ggplot(aes(x = alpha_ij_sd, y = value, col = variable)) +
+expl_all_long %>%
+  filter(commstab_type == "rawcommstab", summary_type == "mean") %>%
+  ggplot(aes(x = alpha_ij_sd, y = rsq, col = `trait_type`)) +
+  geom_point() +
+  geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs")) +
+  xlab("Strength of interspecific interactions") +
+  ylab("Proportion of variation in community stability\nexplained by two types of response trait") +
+  #scale_color_manual(labels = c("Fundamental trait", "Realised trait"), values = c("blue", "red")) +
+  labs(colour = "Type of response trait") +
+  ggtitle("Community mean of trait")
+  
+```
+
+Seems surprising that the fundamental niche-based response traits always (on average) provide greater explanatory power. This contradicts expectations in the Introduction section (@sec-introduction).
+
+
+```{r}
+#| echo: false
+expl_all_long %>%
+  filter(commstab_type == "abscommstab", summary_type == "RD", summary_subtype == "diss") %>%
+  ggplot(aes(x = alpha_ij_sd, y = rsq, col = trait_type)) +
   geom_point() +
   geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs")) +
   xlab("Strength of interspecific interactions") +
   ylab("Proportion of variation in community stability\nexplained by two types of response trait") +
   scale_color_manual(labels = c("Fundamental trait", "Realised trait"), values = c("blue", "red")) +
-  labs(colour = "Type of response trait")
+  labs(colour = "Type of response trait") +
+  ggtitle("Community response diversity (dissimilarity) of trait")
   
 ```
 
-Seems surprising that the fundamental niche-based response traits always (on average) provide greater explanatory power. This contradicts expectations in the Introduction section (@sec-introduction).
+
+```{r}
+#| echo: false
+expl_all_long %>%
+  filter(commstab_type == "abscommstab", summary_type == "RD", summary_subtype == "div") %>%
+  ggplot(aes(x = alpha_ij_sd, y = rsq, col = trait_type)) +
+  geom_point() +
+  geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs")) +
+  xlab("Strength of interspecific interactions") +
+  ylab("Proportion of variation in community stability\nexplained by two types of response trait") +
+  scale_color_manual(labels = c("Fundamental trait", "Realised trait"), values = c("blue", "red")) +
+  labs(colour = "Type of response trait") +
+  ggtitle("Community response diversity (divergence) of trait")
+  
+  
+```
+
+```{r}
+#| echo: false
+expl_all_long %>%
+  filter(trait_type == "fundamental") %>%
+  mutate(summary_type = paste(summary_type, summary_subtype)) %>%
+  ggplot(aes(x = alpha_ij_sd, y = rsq, col = summary_type)) +
+  facet_wrap(vars(commstab_type)) +
+  geom_point() +
+  geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs")) +
+  xlab("Strength of interspecific interactions") +
+  ylab("Proportion of variation in community stability\nexplained by two types of response trait") +
+  #scale_color_manual(labels = c("Fundamental trait", "Realised trait"), values = c("blue", "red", "black")) +
+  labs(colour = "Type of measure") +
+  ggtitle("Fundamental niche-based community measures") +
+  scale_y_continuous(breaks = seq(0, 1, 0.2))
+```
+
+
+
+```{r}
+#| echo: false
+expl_all_long %>%
+  filter(trait_type == "realised") %>%
+  mutate(summary_type = paste(summary_type, summary_subtype)) %>%
+  ggplot(aes(x = alpha_ij_sd, y = rsq, col = summary_type)) +
+  facet_wrap(vars(commstab_type)) +
+  geom_point() +
+  geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs")) +
+  xlab("Strength of interspecific interactions") +
+  ylab("Proportion of variation in community stability\nexplained by two types of response trait") +
+  #scale_color_manual(labels = c("Fundamental trait", "Realised trait"), values = c("blue", "red", "black")) +
+  labs(colour = "Type of measure") +
+  ggtitle("Realised niche-based community measures") +
+  scale_y_continuous(breaks = seq(0, 1, 0.2))
+```
+
 
 ## Response trait and community stability
 
@@ -272,7 +347,7 @@ comm_all |>
 #| echo: false
 #| eval: false
 comm_all |> 
-  ggplot(aes(x = RD_diss, y = OEV_spline)) +
+  ggplot(aes(x = RD_diss_igr_effect, y = OEV_spline)) +
   geom_point() +
   facet_wrap(vars(alpha_ij_sd), ncol = 4, scales = "free_y")  +
   theme(legend.position="none") +
@@ -283,14 +358,12 @@ comm_all |>
 #| echo: false
 #| eval: false
 comm_all |> 
-  ggplot(aes(x = RD_div, y = OEV_spline)) +
+  ggplot(aes(x = RD_div_igr_effect, y = OEV_spline)) +
   geom_point() +
   facet_wrap(vars(alpha_ij_sd), ncol = 4, scales = "free_y")  +
   theme(legend.position="none") +
   ggtitle("Fundamental niche-based response trait (RD_div), with OEV = sqrt(abs(comm_auc))")
 ```
-
-
 
 ## Some individual communities
 
@@ -436,7 +509,7 @@ comm_all |>
 #| echo: false
 comm_all |> 
   ggplot(aes(x = mean_igr_effect,
-             y = RD_diss)) +
+             y = RD_diss_igr_effect)) +
   geom_point() +
   facet_wrap(vars(alpha_ij_sd), nrow = 4) +
   theme(legend.position="none")
@@ -446,9 +519,8 @@ comm_all |>
 #| echo: false
 comm_all |> 
   ggplot(aes(x = mean_igr_effect,
-             y = RD_div)) +
+             y = RD_div_igr_effect)) +
   geom_point() +
   facet_wrap(vars(alpha_ij_sd), nrow = 4) +
   theme(legend.position="none")
 ```
-

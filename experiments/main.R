@@ -46,3 +46,9 @@ source(here("experiments/3-analyse/recalc all get_stab_and_respdiv.R"))
 # remerge the relevant files
 source(here("experiments/3-analyse/redo final_data_processing.R"))
 
+
+## Here is how to add new diversity measures. Its possibly still not so clear, so let me know if something seems amiss or unclear. ----
+## 1. Add to the calculation in the file `experiments/3-analyse/recalc all get_stab_and_respdiv.R`.
+## 2. Run all script in that file.
+## 3. Run all scritp in file `experiments/3-analyse/redo final_data_processing.R`
+## 4. Add to the report file `reports/main-report.R`

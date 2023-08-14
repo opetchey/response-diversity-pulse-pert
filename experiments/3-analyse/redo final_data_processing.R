@@ -97,18 +97,33 @@ saveRDS(comm_all, here("data/merged/comm_all.RDS"))
 
 ## Here the code for calculating the explanatory power ----
 
-expl1 <- comm_all %>%
+expl <- comm_all %>%
   ungroup() %>%
   nest_by(pack, alpha_ij_sd) %>%
-  mutate(model = list(gam(comm_tot_deltabm_spline ~ s(mean_spp_deltabm_spline), data = data))) %>%
-  summarise(rsq_realised = summary(model)$r.sq)
-
-expl2 <- comm_all %>%
-  ungroup() %>%
-  nest_by(pack, alpha_ij_sd) %>%
-  mutate(model = list(gam(comm_tot_deltabm_spline ~ s(mean_igr_effect), data = data))) %>%
-  summarise(rsq_fundamental = summary(model)$r.sq)
-
+  mutate(model1 = list(gam(comm_tot_deltabm_spline ~ s(mean_spp_deltabm_spline), data = data)),
+         model2 = list(gam(comm_tot_deltabm_spline ~ s(RD_diss_spp_deltabm_spline), data = data)),
+         model3 = list(gam(comm_tot_deltabm_spline ~ s(RD_div_spp_deltabm_spline), data = data)),
+         model4 = list(gam(comm_tot_deltabm_spline ~ s(mean_igr_effect), data = data)),
+         model5 = list(gam(comm_tot_deltabm_spline ~ s(RD_diss_igr_effect), data = data)),
+         model6 = list(gam(comm_tot_deltabm_spline ~ s(RD_div_igr_effect), data = data)),
+         model7 = list(gam(OEV_spline ~ s(mean_spp_deltabm_spline), data = data)),
+         model8 = list(gam(OEV_spline ~ s(RD_diss_spp_deltabm_spline), data = data)),
+         model9 = list(gam(OEV_spline ~ s(RD_div_spp_deltabm_spline), data = data)),
+         model10 = list(gam(OEV_spline ~ s(mean_igr_effect), data = data)),
+         model11 = list(gam(OEV_spline ~ s(RD_diss_igr_effect), data = data)),
+         model12 = list(gam(OEV_spline ~ s(RD_div_igr_effect), data = data))) %>%
+  summarise(rsq_rawcommstab_realised_mean = summary(model1)$r.sq,
+            rsq_rawcommstab_realised_RD_diss = summary(model2)$r.sq,
+            rsq_rawcommstab_realised_RD_div = summary(model3)$r.sq,
+            rsq_rawcommstab_fundamental_mean = summary(model4)$r.sq,
+            rsq_rawcommstab_fundamental_RD_diss = summary(model5)$r.sq,
+            rsq_rawcommstab_fundamental_RD_div = summary(model6)$r.sq,
+            rsq_abscommstab_realised_mean = summary(model7)$r.sq,
+            rsq_abscommstab_realised_RD_diss = summary(model8)$r.sq,
+            rsq_abscommstab_realised_RD_div = summary(model9)$r.sq,
+            rsq_abscommstab_fundamental_mean = summary(model10)$r.sq,
+            rsq_abscommstab_fundamental_RD_diss = summary(model11)$r.sq,
+            rsq_abscommstab_fundamental_RD_div = summary(model12)$r.sq)
 
 #mod1 <- comm_all %>% 
 #  filter(alpha_ij_sd == 0) %>%
@@ -116,12 +131,7 @@ expl2 <- comm_all %>%
 #summary(mod1)
 
 
-expl_all <- full_join(expl1, expl2) %>%
-  pivot_longer(names_to = "variable",
-               values_to = "value",
-               cols = 3:4)
-
-saveRDS(expl_all, here("data/merged/expl_all.RDS"))
+saveRDS(expl, here("data/merged/expl_all.RDS"))
 
 
 ## and the dynamics of total community biomass ----
