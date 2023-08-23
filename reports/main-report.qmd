@@ -169,7 +169,12 @@ Currently we calculate:
 
 ### Community stability
 
-This was calculated as the effect of the pulse perturbation on the total community biomass. Specifically the area between the control and perturbed dynamics. Stability is greatest when this is zero. More negative and more positive values imply lower stability. To make a measure of stability, we take the absolute value of this. Both the actual value and the absolute are used below, in different settings.
+This was calculated as the effect of the pulse perturbation on the total community biomass. This effect varied through time (e.g., often decreased monotonically after the pulse ended). The effect was calculated as the control - perturbed abundance and could conceivably be sometimes positive and sometimes negative. Examples of the dynamcis of total biomass in control and perturbed treatments are given in the Appendix.
+
+In one measure of community stability, we took the sum (over time) of the effect. If the effect was always positive, the summed effect would be positive and if the effect was always negative then the summed effect would be negative. A small (close to zero) summed effect could result from a balance of positive and negative effects, or just very small but consistent positive (or negative) effects. Stability is greatest when the summed effect is zero. More negative and more positive values imply lower stability. We call this raw community stability.
+
+Another measure was the sum of the absolute effect size. This will only be small (closer to zero) when the perturbation has a consistently small effect (positive, or negative, or mix of positive and negative). A mix of large positive and large positive effect would lead to a large value of this measure. We call this absolute community stability.
+
 
 # Results
 
@@ -198,6 +203,7 @@ expl_all_long <- expl_all %>%
 
 ```{r}
 #| echo: false
+#| eval: false
 expl_all_long %>%
   filter(commstab_type == "rawcommstab", summary_type == "mean") %>%
   ggplot(aes(x = alpha_ij_sd, y = rsq, col = `trait_type`)) +
@@ -215,6 +221,7 @@ Seems surprising that the fundamental niche-based response traits always (on ave
 
 ```{r}
 #| echo: false
+#| eval: false
 expl_all_long %>%
   filter(commstab_type == "abscommstab", summary_type == "RD", summary_subtype == "diss") %>%
   ggplot(aes(x = alpha_ij_sd, y = rsq, col = trait_type)) +
@@ -230,6 +237,7 @@ expl_all_long %>%
 
 ```{r}
 #| echo: false
+#| eval: false
 expl_all_long %>%
   filter(commstab_type == "abscommstab", summary_type == "RD", summary_subtype == "div") %>%
   ggplot(aes(x = alpha_ij_sd, y = rsq, col = trait_type)) +

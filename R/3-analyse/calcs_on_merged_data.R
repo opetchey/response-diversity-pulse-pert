@@ -51,12 +51,12 @@ expl <- comm_all %>%
          model4 = list(gam(comm_tot_deltabm_spline ~ s(mean_igr_effect), data = data)),
          model5 = list(gam(comm_tot_deltabm_spline ~ s(RD_diss_igr_effect), data = data)),
          model6 = list(gam(comm_tot_deltabm_spline ~ s(RD_div_igr_effect), data = data)),
-         model7 = list(gam(OEV_spline ~ s(mean_spp_deltabm_spline), data = data)),
-         model8 = list(gam(OEV_spline ~ s(RD_diss_spp_deltabm_spline), data = data)),
-         model9 = list(gam(OEV_spline ~ s(RD_div_spp_deltabm_spline), data = data)),
-         model10 = list(gam(OEV_spline ~ s(mean_igr_effect), data = data)),
-         model11 = list(gam(OEV_spline ~ s(RD_diss_igr_effect), data = data)),
-         model12 = list(gam(OEV_spline ~ s(RD_div_igr_effect), data = data))) %>%
+         model7 = list(gam(OEV ~ s(mean_spp_deltabm_spline), data = data)),
+         model8 = list(gam(OEV ~ s(RD_diss_spp_deltabm_spline), data = data)),
+         model9 = list(gam(OEV ~ s(RD_div_spp_deltabm_spline), data = data)),
+         model10 = list(gam(OEV ~ s(mean_igr_effect), data = data)),
+         model11 = list(gam(OEV ~ s(RD_diss_igr_effect), data = data)),
+         model12 = list(gam(OEV ~ s(RD_div_igr_effect), data = data))) %>%
   summarise(rsq_rawcommstab_realised_mean = summary(model1)$r.sq,
             rsq_rawcommstab_realised_RD_diss = summary(model2)$r.sq,
             rsq_rawcommstab_realised_RD_div = summary(model3)$r.sq,

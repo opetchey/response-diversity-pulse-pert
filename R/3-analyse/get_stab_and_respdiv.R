@@ -38,9 +38,8 @@ comm_stab <- comm_time_stab |>
   filter((Time %% keep_every_t) == 0) |> 
   group_by(case_id, community_id, replicate_id) |> 
   summarise(comm_tot_deltabm_spline = my_auc_func_spline(Time, comm_deltabm),
-            comm_tot_deltabm_raw = my_auc_func_raw(Time, comm_deltabm)) |> 
-  mutate(OEV_spline = sqrt(abs(comm_tot_deltabm_spline)),
-         OEV_raw = sqrt(abs(comm_tot_deltabm_raw)))
+            comm_tot_deltabm_raw = my_auc_func_raw(Time, comm_deltabm),
+            OEV = my_auc_func_spline(Time, abs(comm_deltabm)))
 ## I would be cautious about using splines without checking they are
 ## working as expected, here, and for the species level auc calculations.
 ## They might be not very well constrained at the two ends of the RD axis,
@@ -56,8 +55,13 @@ species_time_stab <- dynamics |>
   ## remove rows where biomass is 0 in both control and treatment
   #filter((Con.M + Dist.M) != 0) |>
   pivot_wider(names_from = Treatment, values_from = Abundance) |> 
+ # group_by(case_id, community_id) |> 
+  #mutate(con.tot = sum(Control),
+ #        treat.tot = sum(Perturbed))
+  
   mutate(spp_deltabm = (Perturbed - Control)/
            (Perturbed + Control))
+
 species_stab <- species_time_stab |>
   filter((Time %% keep_every_t) == 0) |> 
   group_by(case_id, community_id, replicate_id, Species_ID) |> 
@@ -73,6 +77,8 @@ comm_indicies <- species_stab |>
   group_by(community_id, replicate_id, case_id) |> 
   summarise(mean_spp_deltabm_spline = mean(species_tot_deltabm_spline),
             var_spp_deltabm_spline = var(species_tot_deltabm_spline),
+            RD_diss_spp_deltabm_spline = resp_div(species_tot_deltabm_raw, sign_sens = FALSE),
+            RD_div_spp_deltabm_spline = resp_div(species_tot_deltabm_raw, sign_sens = TRUE),
             mean_spp_deltabm_raw = mean(species_tot_deltabm_raw),
             var_spp_deltabm_raw = var(species_tot_deltabm_raw))
 
@@ -80,7 +86,9 @@ comm_indicies <- species_stab |>
 igr_respdiv <- species_igr_pert_effect |> 
   group_by(case_id) |> 
   summarise(mean_igr_effect = mean(igr_pert_effect),
-            var_igr_effect = var(igr_pert_effect))
+            var_igr_effect = var(igr_pert_effect),
+            RD_diss_igr_effect = resp_div(igr_pert_effect, sign_sens = FALSE),
+            RD_div_igr_effect = resp_div(igr_pert_effect, sign_sens = TRUE))
 
 ## merge with comm stability measures 
 comm_all <- full_join(comm_stab, comm_indicies) |> 
