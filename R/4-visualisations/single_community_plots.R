@@ -1,9 +1,8 @@
 
-coi <- expt |> 
-  filter(alpha_ij_sd == alpha_oi,
-         pack == pack_oi,
-         b_opt_mean == bopt_oi) |> 
-  pull(case_id)
+# coi <- expt |> 
+#   filter(alpha_ij_sd == alpha_oi,
+#          pack == pack_oi,
+#          b_opt_mean == bopt_oi)
 
 min_temperature <- min(c(temperature_treatments$temperature_control,
                          temperature_treatments$temperature_pulse))
@@ -15,7 +14,9 @@ buffer <- (max_temperature - min_temperature ) / 5
 temperatures <- seq(min_temperature - buffer, max_temperature + buffer, 0.1)
 
 temp <- expt |>
-  dplyr::filter(case_id == coi)
+  filter(alpha_ij_sd == alpha_oi,
+         pack == pack_oi,
+         b_opt_mean == bopt_oi)
 #temp$community_object
 b_opt_i <- temp$community_object[[1]]$b_opt_i
 a_b_i <- temp$community_object[[1]]$a_b_i
@@ -62,12 +63,18 @@ p_resp_curves <- resp_curves |>
 
 ## Look at some of the species level data
 conn <- DBI::dbConnect(RSQLite::SQLite(), here("data/merged/dynamics.db"))
-#dynamics <- tbl(conn, "dynamics")
-dynamics_oi <- dbGetQuery(conn,
-                          "SELECT *
-           FROM dynamics
-           WHERE case_id = ?",
-           params = coi)
+dynamics <- tbl(conn, "dynamics")
+# dynamics_oi <- dbGetQuery(conn,
+#                           "SELECT *
+#            FROM dynamics
+#            WHERE case_id = ?",
+#            params = coi)
+
+dynamics_oi <- dynamics |> 
+  filter(alpha_ij_sd == alpha_oi,
+         pack == pack_oi,
+         b_opt_mean == bopt_oi) |> 
+  collect()
 dbDisconnect(conn)
 
 
@@ -81,7 +88,9 @@ p_dynamics <- dynamics_oi |>
 
 #| echo: false
 traits_table <- species_response_traits %>% 
-  filter(case_id == coi) |>
+  filter(alpha_ij_sd == alpha_oi,
+         pack == pack_oi,
+         b_opt_mean == bopt_oi) |>
   select(species_id,
          species_tot_deltabm_spline,
          species_tot_deltabm_raw,
@@ -90,20 +99,22 @@ traits_table <- species_response_traits %>%
   kable_styling()
 
 #| echo: false
-p1 <- comm_time_stab |>
-  filter(case_id == coi) |> 
+comm_time_stab_oi <- comm_time_stab |>
+  filter(alpha_ij_sd == alpha_oi,
+         pack == pack_oi,
+         b_opt_mean == bopt_oi)
+
+p1 <- comm_time_stab_oi |>
   ggplot(aes(x = Time)) +
   geom_line(aes(y = Control), col = "black", linewidth = 3) +
   geom_line(aes(y = Perturbed), col = "red", linewidth = 1) +
   ylab("Total abundance")
 
-p2 <- comm_time_stab |>
-  filter(case_id == coi) |> 
+p2 <- comm_time_stab_oi |>
   ggplot(aes(x = Time)) +
   geom_line(aes(y = comm_LRR))
 
-p3 <- comm_time_stab |>
-  filter(case_id == coi) |> 
+p3 <- comm_time_stab_oi |>
   ggplot(aes(x = Time)) +
   geom_line(aes(y = comm_deltabm))
 p_commstab1 <- p1 / p2 / p3

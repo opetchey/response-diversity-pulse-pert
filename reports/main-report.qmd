@@ -32,7 +32,7 @@ library(mgcv)
 library(broom)
 library(DBI)
 
-source(here("R/intrinsic_growth_rate.R"))
+source(here("R/0-functions/intrinsic_growth_rate.R"))
 
 options(dplyr.summarise.inform = FALSE)
 
@@ -114,7 +114,7 @@ The following need to be specified for a community (in addition to the number of
 
 ```{r}
 #| echo: false
-species_and_community_properties <- read_excel(here("experiments/1-design/species_and_community_properties.xlsx"))
+species_and_community_properties <- read_excel(here("experiments/species_and_community_properties.xlsx"))
 species_and_community_properties %>% 
   kbl() %>%
   kable_styling()
@@ -213,7 +213,6 @@ expl_all_long %>%
 
 Seems surprising that the fundamental niche-based response traits always (on average) provide greater explanatory power. This contradicts expectations in the Introduction section (@sec-introduction).
 
-
 ```{r}
 #| echo: false
 expl_all_long %>%
@@ -228,7 +227,6 @@ expl_all_long %>%
   ggtitle("Community response diversity (dissimilarity) of trait")
   
 ```
-
 
 ```{r}
 #| echo: false
@@ -263,8 +261,6 @@ expl_all_long %>%
   scale_y_continuous(breaks = seq(0, 1, 0.2))
 ```
 
-
-
 ```{r}
 #| echo: false
 expl_all_long %>%
@@ -281,7 +277,6 @@ expl_all_long %>%
   ggtitle("Realised niche-based community measures") +
   scale_y_continuous(breaks = seq(0, 1, 0.2))
 ```
-
 
 ## Response trait and community stability
 
@@ -383,7 +378,7 @@ bopt_oi <- 17.0
 **No inter-specific interactions (sd(alpha_ij) = `r alpha_oi`) and low average optimum temperature (mean(b_opt) = `r bopt_oi`), so the pulse has positive effect on intrinsic growth rate of most species.**
 
 ```{r}
-source(here("R/single_community_plots.R"))
+source(here("R/4-visualisations/single_community_plots.R"))
 p_resp_curves
 p_dynamics
 traits_table
@@ -402,7 +397,7 @@ bopt_oi <- 21.0
 **No inter-specific interactions (sd(alpha_ij) = `r alpha_oi`) and low average optimum temperature (mean(b_opt) = `r bopt_oi`), so the pulse has negative effect on intrinsic growth rate of most species.**
 
 ```{r}
-source(here("R/single_community_plots.R"))
+source(here("R/4-visualisations/single_community_plots.R"))
 p_resp_curves
 p_dynamics
 traits_table
@@ -421,7 +416,7 @@ bopt_oi <- 19.0
 **No inter-specific interactions (sd(alpha_ij) = `r alpha_oi`) and intermediate average optimum temperature (mean(b_opt) = `r bopt_oi`), so the pulse has negative effect on intrinsic growth rate of some species, and positive effect on others.**
 
 ```{r}
-source(here("R/single_community_plots.R"))
+source(here("R/4-visualisations/single_community_plots.R"))
 p_resp_curves
 p_dynamics
 traits_table
@@ -440,7 +435,7 @@ bopt_oi <- 19.0
 **"Weak" inter-specific interactions (sd(alpha_ij) = `r alpha_oi`) and intermediate average optimum temperature (mean(b_opt) = `r bopt_oi`), so the pulse has negative effect on intrinsic growth rate of some species, and positive effect on others.**
 
 ```{r}
-source(here("R/single_community_plots.R"))
+source(here("R/4-visualisations/single_community_plots.R"))
 p_resp_curves
 p_dynamics
 traits_table
@@ -459,7 +454,7 @@ bopt_oi <- 19.0
 **"Strong\* inter-specific interactions (sd(alpha_ij) = `r alpha_oi`) and intermediate average optimum temperature (mean(b_opt) = `r bopt_oi`), so the pulse has negative effect on intrinsic growth rate of some species, and positive effect on others.**
 
 ```{r}
-source(here("R/single_community_plots.R"))
+source(here("R/4-visualisations/single_community_plots.R"))
 p_resp_curves
 p_dynamics
 traits_table

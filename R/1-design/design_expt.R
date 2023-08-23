@@ -8,7 +8,7 @@ library(here)
 library(kableExtra)
 library(patchwork)
 
-source(here("R/make a community.R"))
+source(here("R/0-functions/make a community.R"))
 
 ## define the experimental treatments ----
 b_opt_mean_treatment <- seq(17, 21, 0.2)
@@ -50,7 +50,7 @@ community_object <- expt %>%
                                          alpha_ij_sd = .$alpha_ij_sd,
                                          intrafactor = intrafactor))
 expt <- cbind(expt, community_object)
-saveRDS(expt, here("data/expt_communities.RDS"))
+saveRDS(expt, here("data", pack, "expt_communities.RDS"))
 
 
 ## Create the perturbation treatment ----
@@ -59,6 +59,7 @@ temperature_pulse <- 15
 duration_pulse <- 50
 before_pulse <- 10000
 after_pulse <- 1000
+ignore_first <- 9900
 temperature_treatments <- tibble(
   time = seq(0, before_pulse + duration_pulse + after_pulse, 1),
   temperature_control1 = rep(temperature_control, (before_pulse + duration_pulse + after_pulse + 1)),
@@ -73,7 +74,7 @@ temperature_treatments <- tibble(
 #  ggplot(aes(x = time, y = temperature, col = treatment_level)) +
 #  geom_line()
 
-saveRDS(temperature_treatments, here("data/temperature_treatments.RDS"))
+saveRDS(temperature_treatments, here("data", pack, "temperature_treatments.RDS"))
 
 
 

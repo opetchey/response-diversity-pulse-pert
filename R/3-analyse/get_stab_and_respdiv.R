@@ -1,24 +1,12 @@
-rm(list=ls())
-
-library(tidyverse)
-library(readxl)
-library(MESS)
-library(here)
-#library(cowplot)
-#library(GGally)
-library(patchwork)
-
-## source any required user defined functions
-source(here("R/my_auc.R"))
 
 ## sub-sample rate
 keep_every_t <- 10
 
 ## read data
-temp <- readRDS(here("data/sim_results.RDS"))
+temp <- readRDS(here("data", pack, "sim_results.RDS"))
 community_pars <- temp$community_pars
 dynamics <- temp$dynamics_long
-species_igr_pert_effect <- readRDS(here("data/species_igr_pert_effect.RDS"))
+species_igr_pert_effect <- readRDS(here("data", pack, "species_igr_pert_effect.RDS"))
 
 
 
@@ -40,7 +28,7 @@ comm_time_stab <- dynamics |>
 
 comm_time_stab |>
   filter(case_id =="Comm-6-rep-1",
-        # Time > 10400, Time < 10500,
+         # Time > 10400, Time < 10500,
          (Time %% keep_every_t) == 0) |> 
   ggplot(aes(x = Time, y = comm_deltabm)) +
   geom_line()
@@ -98,7 +86,7 @@ igr_respdiv <- species_igr_pert_effect |>
 comm_all <- full_join(comm_stab, comm_indicies) |> 
   full_join(igr_respdiv)
 
-saveRDS(comm_all, here("data/community_measures.RDS"))
+saveRDS(comm_all, here("data", pack, "community_measures.RDS"))
 
 
 
@@ -109,7 +97,4 @@ species_igr_pert_effect <-
 species_stab <- species_stab |> 
   rename(species_id = Species_ID)
 species_all <- full_join(species_igr_pert_effect, species_stab)
-saveRDS(species_all, here("data/species_measures.RDS"))
-
-
-
+saveRDS(species_all, here("data", pack, "species_measures.RDS"))

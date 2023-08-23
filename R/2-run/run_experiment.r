@@ -1,4 +1,4 @@
-rm(list = ls())
+#rm(list = ls())
 
 ## Some preliminaries ----
 options(scipen = 1, digits = 3) #set to two decimal 
@@ -9,8 +9,8 @@ library(gridExtra)
 #seed <- 101
 
 ## source some functions ----
-source(here("R/simulator_lv.R"))
-source(here("R/make a community.R"))
+source(here("R/0-functions/simulator_lv.R"))
+source(here("R/0-functions/make a community.R"))
 
 
 #set.seed(seed)
@@ -19,8 +19,8 @@ source(here("R/make a community.R"))
 
 ## read in experimental design
 ## Created by code in "design_expt.r" script in the experiments/1-design folder
-expt <- readRDS("data/expt_communities.RDS")
-temperature_treatments <- readRDS("data/temperature_treatments.RDS")
+expt <- readRDS(here("data", pack, "expt_communities.RDS"))
+temperature_treatments <- readRDS(here("data", pack, "temperature_treatments.RDS"))
 
 
 ## run experiment ----
@@ -153,11 +153,11 @@ for(i in 1:nrow(dynamics)) {
   
 }
 dynamics_long <- dynamics_long %>%
-  filter(Time > 9900)
+  filter(Time > ignore_first)
 
 
 ## save the results
 all_results <- list(community_pars = community_pars,
                     dynamics_long = dynamics_long)
-saveRDS(all_results, here("data/sim_results.RDS"))
+saveRDS(all_results, here("data", pack, "sim_results.RDS"))
 

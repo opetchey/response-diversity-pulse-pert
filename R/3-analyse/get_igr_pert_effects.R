@@ -1,13 +1,13 @@
-rm(list = ls())
+#rm(list = ls())
 
 library(dplyr)
 
-source(here("R/intrinsic_growth_rate.R"))
+source(here("R/0-functions/intrinsic_growth_rate.R"))
 
 ## read in experimental design
 ## Created by code in "design_expt.r" script in the experiments/1-design folder
-expt <- readRDS(here("data/expt_communities.RDS"))
-temperature_treatments <- readRDS(here("data/temperature_treatments.RDS"))
+expt <- readRDS(here("data", pack, "expt_communities.RDS"))
+temperature_treatments <- readRDS(here("data", pack, "temperature_treatments.RDS"))
 
 ## Get control and perturbation temperatures
 ## Assume the perturbation is a decrease in temperature
@@ -65,4 +65,4 @@ species_igr_pert_effect <- species_pars |>
   select(case_id, species_id, igr_pert_effect)
 
 
-saveRDS(species_igr_pert_effect, here("data/species_igr_pert_effect.RDS"))
+saveRDS(species_igr_pert_effect, here("data", pack, "species_igr_pert_effect.RDS"))
