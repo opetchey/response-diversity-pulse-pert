@@ -2,6 +2,7 @@
 
 library(mFD)
 library(tidyverse)
+library(here)
 
 ### import data ###
 
@@ -151,6 +152,9 @@ which(is.na(Fdiv$OEV))
 saveRDS(Fdiv, here('data/merged/Fdiv_responseDiversity.RDS'))
 
 #### plots ####
+
+Fdiv <- readRDS(here('data/merged/Fdiv_responseDiversity.RDS'))
+
 
 ## overall ##
 p1<-ggplot(Fdiv, aes(x = RD_diss, y = comm_tot_deltabm, alpha = alpha_ij_sd))+

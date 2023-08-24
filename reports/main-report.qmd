@@ -175,7 +175,7 @@ In one measure of community stability, we took the sum (over time) of the effect
 
 Another measure was the sum of the absolute effect size (OEV). This will only be small (closer to zero) when the perturbation has a consistently small effect (positive, or negative, or mix of positive and negative). A mix of large positive and large positive effect would lead to a large value of this measure. We call this absolute community stability.
 
-![community stability schematic](assets/community_stability_methods.png){width=80%}
+![community stability schematic](assets/community_stability_methods.png){width="80%"}
 
 # Results
 
@@ -528,3 +528,88 @@ comm_all |>
   facet_wrap(vars(alpha_ij_sd), nrow = 4) +
   theme(legend.position="none")
 ```
+
+
+# From Charly
+
+```{r}
+
+Fdiv <- readRDS(here('data/merged/Fdiv_responseDiversity.RDS'))
+
+
+## overall ##
+p1<-ggplot(Fdiv, aes(x = RD_diss, y = comm_tot_deltabm, alpha = alpha_ij_sd))+
+  geom_point()+
+  theme_bw()
+
+p2<-ggplot(Fdiv, aes(x = RD_div, y = comm_tot_deltabm, alpha = alpha_ij_sd))+
+  geom_point()+
+  theme_bw()
+
+p6<-ggplot(Fdiv, aes(x = mean_igr_effect, y = comm_tot_deltabm, alpha = alpha_ij_sd))+
+  geom_point()+
+  theme_bw()
+
+p3<-ggplot(Fdiv, aes(x = fdis, y = comm_tot_deltabm, alpha = alpha_ij_sd))+
+  geom_point()+
+  theme_bw()
+
+p4<-ggplot(Fdiv, aes(x = feve, y = comm_tot_deltabm, alpha = alpha_ij_sd))+
+  geom_point()+
+  theme_bw()
+
+p5<-ggplot(Fdiv, aes(x = fric, y = comm_tot_deltabm, alpha = alpha_ij_sd))+
+  geom_point()+
+  theme_bw()
+
+(p1 + ggtitle('Fundamental niche based')) / p2 / p6
+#ggsave(plot = last_plot(), file = 'RD_Ross_etal_OEV.png', width = 10, height = 4)
+
+(p3 + ggtitle('mFD RD')) / p4 / p5
+#ggsave(plot = last_plot(), file = 'RD_mFD_OEV.png', width = 10, height = 4)
+
+### OEV ###
+p1<-ggplot(Fdiv, aes(x = RD_diss, y = OEV, alpha = alpha_ij_sd))+
+  geom_point()+
+  theme_bw()
+
+p2<-ggplot(Fdiv, aes(x = RD_div, y = OEV, alpha = alpha_ij_sd))+
+  geom_point()+
+  theme_bw()
+
+p6<-ggplot(Fdiv, aes(x = mean_igr_effect, y = OEV, alpha = alpha_ij_sd))+
+  geom_point()+
+  theme_bw()
+
+p3<-ggplot(Fdiv, aes(x = fdis, y = OEV, alpha = alpha_ij_sd))+
+  geom_point()+
+  theme_bw()
+
+p4<-ggplot(Fdiv, aes(x = feve, y = OEV, alpha = alpha_ij_sd))+
+  geom_point()+
+  theme_bw()
+
+p5<-ggplot(Fdiv, aes(x = fric, y = OEV, alpha = alpha_ij_sd))+
+  geom_point()+
+  theme_bw()
+
+(p1 + ggtitle('Fundamental niche based')) / p2 / p6
+#ggsave(plot = last_plot(), file = 'RD_Ross_etal_OEV.png', width = 10, height = 4)
+
+(p3 + ggtitle('mFD RD')) / p4 / p5
+#ggsave(plot = last_plot(), file = 'RD_mFD_OEV.png', width = 10, height = 4)
+
+
+## facets ##
+p1+facet_wrap(~alpha_ij_sd)
+p2+facet_wrap(~alpha_ij_sd)
+p6+facet_wrap(~alpha_ij_sd)
+
+p3+facet_wrap(~alpha_ij_sd)
+p4+facet_wrap(~alpha_ij_sd)
+p5+facet_wrap(~alpha_ij_sd)
+
+
+```
+
+
