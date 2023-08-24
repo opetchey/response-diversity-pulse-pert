@@ -1,10 +1,9 @@
 # AUC function
 
-
 my_auc_func_spline <- function(x, y) {
   
   if(length(x) > 2) {
-    result <- auc(x,
+    result <- MESS::auc(x,
                   y,
                   from = min(0, na.rm = TRUE),
                   to = max(x, na.rm = TRUE),
