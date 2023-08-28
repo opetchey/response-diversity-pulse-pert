@@ -22,24 +22,23 @@ comm_time_stab <- dynamics |>
   summarise(tot_ab = sum(Abundance, na.rm = T)) %>%
   pivot_wider(names_from = Treatment, values_from = tot_ab) %>%
   mutate(comm_LRR = log(Perturbed / Control),
-         comm_deltabm = (Perturbed - Control) /
+         comm_RR = (Perturbed - Control) /
            (Perturbed + Control))
 
 
-comm_time_stab |>
-  filter(case_id =="Comm-6-rep-1",
-         # Time > 10400, Time < 10500,
-         (Time %% keep_every_t) == 0) |> 
-  ggplot(aes(x = Time, y = comm_deltabm)) +
-  geom_line()
+# comm_time_stab |>
+#   filter(case_id =="Comm-6-rep-1",
+#          # Time > 10400, Time < 10500,
+#          (Time %% keep_every_t) == 0) |> 
+#   ggplot(aes(x = Time, y = comm_deltabm)) +
+#   geom_line()
 
 ## And now across time points by auc
 comm_stab <- comm_time_stab |>
   filter((Time %% keep_every_t) == 0) |> 
   group_by(case_id, community_id, replicate_id) |> 
-  summarise(comm_tot_deltabm_spline = my_auc_func_spline(Time, comm_deltabm),
-            comm_tot_deltabm_raw = my_auc_func_raw(Time, comm_deltabm),
-            OEV = my_auc_func_spline(Time, abs(comm_deltabm)))
+  summarise(comm_RR_AUC = my_auc_func_linear(Time, comm_RR),
+            OEV = my_auc_func_linear(Time, abs(comm_RR)))
 ## I would be cautious about using splines without checking they are
 ## working as expected, here, and for the species level auc calculations.
 ## They might be not very well constrained at the two ends of the RD axis,
@@ -48,8 +47,14 @@ comm_stab <- comm_time_stab |>
 
 ## Now the species level stabilities ----
 
-## calculate stabilities (for now I don't look at the proportional stab)
-species_time_stab <- dynamics |>
+tot_comm_ab <- dynamics |>
+  ## remove rows where biomass is 0 in both control and treatment
+  #filter((Con.M + Dist.M) != 0) |>
+  group_by(case_id, community_id, replicate_id, Time, Treatment) %>%
+  summarise(tot_ab = sum(Abundance, na.rm = T))
+
+## calculate stabilities (absolute abundance)
+species_time_stab1 <- dynamics |>
   #filter(Time > 9999 & Time < 10051) |> 
   select(-Temperature) |> 
   ## remove rows where biomass is 0 in both control and treatment
@@ -57,30 +62,52 @@ species_time_stab <- dynamics |>
   pivot_wider(names_from = Treatment, values_from = Abundance) |> 
  # group_by(case_id, community_id) |> 
   #mutate(con.tot = sum(Control),
- #        treat.tot = sum(Perturbed))
-  
-  mutate(spp_deltabm = (Perturbed - Control)/
-           (Perturbed + Control))
+ #        treat.tot = sum(Perturbed)) 
+  mutate(spp_RR = (Perturbed - Control)/
+           (Perturbed + Control)) |> 
+  select(-Control, -Perturbed)
+
+## calculate stabilities (relative abundance)
+species_time_stab2 <- dynamics |>
+  full_join(tot_comm_ab) |> 
+  mutate(pi = Abundance / tot_ab) |> 
+  #filter(Time > 9999 & Time < 10051) |> 
+  select(-Temperature, -Abundance, -tot_ab) |> 
+  ## remove rows where biomass is 0 in both control and treatment
+  #filter((Con.M + Dist.M) != 0) |>
+  pivot_wider(names_from = Treatment, values_from = pi) |> 
+  # group_by(case_id, community_id) |> 
+  #mutate(con.tot = sum(Control),
+  #        treat.tot = sum(Perturbed))
+  mutate(delta_pi = Perturbed - Control) |> 
+  select(-Control, -Perturbed)
+
+
+species_time_stab <- full_join(species_time_stab1, species_time_stab2)
+
+# temp <- species_time_stab |> 
+#   filter((Time %% keep_every_t) == 0,
+#          case_id == "Comm-1-rep-1",
+#          Species_ID == "Spp1") %>%
+#   summarise(species_RR_AUC = my_auc_func_linear(Time, spp_RR),
+#             species_delta_pi_AUC = my_auc_func_linear(Time, delta_pi))
 
 species_stab <- species_time_stab |>
   filter((Time %% keep_every_t) == 0) |> 
   group_by(case_id, community_id, replicate_id, Species_ID) |> 
-  summarise(species_tot_deltabm_spline = my_auc_func_spline(Time, spp_deltabm),
-            species_tot_deltabm_raw = my_auc_func_raw(Time, spp_deltabm))
-## AUC calculation is giving warnings when there are duplicate RD values
-## Need to check how important this is.
+  summarise(species_RR_AUC = my_auc_func_linear(Time, spp_RR),
+            species_delta_pi_AUC = my_auc_func_linear(Time, delta_pi))
+
 
 
 ## Calculate community level indicies based on
 ## species level traits
 comm_indicies <- species_stab |> 
   group_by(community_id, replicate_id, case_id) |> 
-  summarise(mean_spp_deltabm_spline = mean(species_tot_deltabm_spline),
-            var_spp_deltabm_spline = var(species_tot_deltabm_spline),
-            RD_diss_spp_deltabm_spline = resp_div(species_tot_deltabm_raw, sign_sens = FALSE),
-            RD_div_spp_deltabm_spline = resp_div(species_tot_deltabm_raw, sign_sens = TRUE),
-            mean_spp_deltabm_raw = mean(species_tot_deltabm_raw),
-            var_spp_deltabm_raw = var(species_tot_deltabm_raw))
+  summarise(mean_species_RR_AUC = mean(species_RR_AUC),
+            var_species_RR_AUC = var(species_RR_AUC),
+            mean_species_delta_pi_AUC = mean(species_delta_pi_AUC),
+            var_species_delta_pi_AUC = var(species_delta_pi_AUC))
 
 ## Calculate response diversity from response curve traits
 igr_respdiv <- species_igr_pert_effect |> 

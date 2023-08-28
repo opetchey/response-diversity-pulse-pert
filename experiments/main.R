@@ -1,3 +1,4 @@
+rm(list =)
 library(here)
 
 ## there is currently no random number seed set.
@@ -29,9 +30,15 @@ library(here)
 #pack <- "pack6"
 #alpha_ij_sd_treatment <- seq(0, 0.5, 0.025)
 
-## pack0 for testing
-pack <- "pack0"
-alpha_ij_sd_treatment <- seq(0, 0.1, 0.1)
+#b_opt_range_treatment <- c(5) ## used in packs 1-6
+
+
+## pack7 for testing
+pack <- "pack7"
+b_opt_mean_treatment <- seq(17.5, 19.5, 0.25)
+b_opt_range_treatment <- c(3,4,5,6,7) ## used in packs 1-6
+# seq(3, 7, 1)
+alpha_ij_sd_treatment <- c(0, 0.25, 0.5)
 
 ## data folder
 dir.create(here("data", pack))

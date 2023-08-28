@@ -11,8 +11,9 @@ library(patchwork)
 source(here("R/0-functions/make a community.R"))
 
 ## define the experimental treatments ----
-b_opt_mean_treatment <- seq(17, 21, 0.2)
-b_opt_range_treatment <- c(5) # seq(3, 7, 1)
+#b_opt_mean_treatment <- seq(17.5, 19.5, 1)
+#b_opt_range_treatment <- c(5) ## used in packs 1-6
+# seq(3, 7, 1)
 alpha_ij_mean_treatment <- c(0)
 
 num_replicates <- 1; rep_names <- paste0("rep-", 1:num_replicates)

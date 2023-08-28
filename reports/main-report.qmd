@@ -173,7 +173,7 @@ This was calculated as the effect of the pulse perturbation on the total communi
 
 In one measure of community stability, we took the sum (over time) of the effect. If the effect was always positive, the summed effect would be positive and if the effect was always negative then the summed effect would be negative. A small (close to zero) summed effect could result from a balance of positive and negative effects, or just very small but consistent positive (or negative) effects. Stability is greatest when the summed effect is zero. More negative and more positive values imply lower stability. We call this raw community stability.
 
-Another measure was the sum of the absolute effect size (OEV). This will only be small (closer to zero) when the perturbation has a consistently small effect (positive, or negative, or mix of positive and negative). A mix of large positive and large positive effect would lead to a large value of this measure. We call this absolute community stability.
+Another measure was the sum of the absolute effect size (OEV, Overall Ecological Vulnerability [Pablo et al 2021](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/1365-2745.13804). This will only be small (closer to zero) when the perturbation has a consistently small effect (positive, or negative, or mix of positive and negative). A mix of large positive and large positive effect would lead to a large value of this measure.
 
 ![community stability schematic](assets/community_stability_methods.png){width="80%"}
 
@@ -197,7 +197,7 @@ And here we show how much variability in community stability is explained by the
 ```{r}
 #| echo: false
 expl_all_long <- expl_all %>%
-  pivot_longer(names_to = "variable", values_to = "rsq", cols = 3:14) %>%
+  pivot_longer(names_to = "variable", values_to = "rsq", cols = 3:10) %>%
   separate(variable, into = c("junk1", "commstab_type", "trait_type", "summary_type", "summary_subtype")) %>%
   select(-junk1)
 ```
@@ -224,7 +224,7 @@ Seems surprising that the fundamental niche-based response traits always (on ave
 #| echo: false
 #| eval: false
 expl_all_long %>%
-  filter(commstab_type == "abscommstab", summary_type == "RD", summary_subtype == "diss") %>%
+  filter(commstab_type == "OEV", summary_type == "RD", summary_subtype == "diss") %>%
   ggplot(aes(x = alpha_ij_sd, y = rsq, col = trait_type)) +
   geom_point() +
   geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs")) +
@@ -240,7 +240,7 @@ expl_all_long %>%
 #| echo: false
 #| eval: false
 expl_all_long %>%
-  filter(commstab_type == "abscommstab", summary_type == "RD", summary_subtype == "div") %>%
+  filter(commstab_type == "OEV", summary_type == "RD", summary_subtype == "div") %>%
   ggplot(aes(x = alpha_ij_sd, y = rsq, col = trait_type)) +
   geom_point() +
   geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs")) +
@@ -302,8 +302,8 @@ In the following various graphs is the relationship between community mean of sp
 
 
 comm_all |> 
-  ggplot(aes(x = mean_spp_deltabm_spline,
-             y = comm_tot_deltabm_spline)) +
+  ggplot(aes(x = mean_species_RR_AUC,
+             y = comm_RR_AUC)) +
   geom_point() +
   facet_wrap(vars(alpha_ij_sd), ncol = 5) +
   theme(legend.position="none") +
@@ -316,7 +316,7 @@ comm_all |>
 #| fig-width: 8
 #| fig-height: 8
 comm_all |> 
-  ggplot(aes(x = mean_igr_effect, y = comm_tot_deltabm_spline)) +
+  ggplot(aes(x = mean_igr_effect, y = mean_species_RR_AUC)) +
   geom_point() +
   facet_wrap(vars(alpha_ij_sd), ncol = 5, scales = "free_y") +
   theme(legend.position="none") +
@@ -328,9 +328,9 @@ comm_all |>
 #| echo: false
 #| eval: false
 comm_all |> 
-  ggplot(aes(x = mean_spp_deltabm_spline, y = OEV_spline)) +
+  ggplot(aes(x = mean_species_RR_AUC, y = OEV)) +
   geom_point() +
-  facet_wrap(vars(alpha_ij_sd), ncol = 3, scales = "free_y") +
+  facet_wrap(vars(alpha_ij_sd), ncol = 5, scales = "free_y") +
   theme(legend.position="none") +
   ggtitle("Realised niche-based response trait, with OEV = sqrt(abs(comm_auc))")
 
@@ -340,9 +340,9 @@ comm_all |>
 #| echo: false
 #| eval: false
 comm_all |> 
-  ggplot(aes(x = mean_igr_effect, y = OEV_spline)) +
+  ggplot(aes(x = mean_igr_effect, y = OEV)) +
   geom_point() +
-  facet_wrap(vars(alpha_ij_sd), ncol = 3, scales = "free_y")  +
+  facet_wrap(vars(alpha_ij_sd), ncol = 5, scales = "free_y")  +
   theme(legend.position="none") +
   ggtitle("Fundamental niche-based response trait, with OEV = sqrt(abs(comm_auc))")
 ```
@@ -367,6 +367,59 @@ comm_all |>
   facet_wrap(vars(alpha_ij_sd), ncol = 4, scales = "free_y")  +
   theme(legend.position="none") +
   ggtitle("Fundamental niche-based response trait (RD_div), with OEV = sqrt(abs(comm_auc))")
+```
+
+## Response balance
+
+Ross et al (2023) proposed that response diversity not just be measured by the spread of response trait values, but also by including if there are some negative and some positive response trait values. They made a measure, called divergence, that is zero when all response trait values are negative or all are positive, and is 1 when the most negative value is equal in magnitude to the most positive value.
+
+In the results above we see that community stability is greatest when the mean of the perturbation effect on species intrinsic growth is zero. A mean of zero results from *balance* in the negative and positive response trait values, i.e., the sum of the positive values equals the sum of the negative values.
+
+Hence, at least in the context of a pulse perturbation we see that the *response balance*, which is calculated as the mean of effects of the pulse on intrinsic growth rate, is an excellent predictor of community stability, at least when interspecific interactions are weak.
+
+We can go a little further, and predict that *response balance* (i.e., `mean_species_igr_effect` = 0) will be greatest when the **expected** temperature optima of the species is half-way between the control and perturbed temperature. This is exactly what occurs in the data, as shown in the graph just below.
+
+```{r}
+#| echo: false
+temperature_treatments <- readRDS(here("data/pack1/temperature_treatments.RDS"))
+control_temperature <- max(temperature_treatments$temperature_control)
+pulse_temperature <- min(temperature_treatments$temperature_pulse)
+mid_temperature <- (control_temperature + pulse_temperature) / 2
+
+comm_all |>
+  ggplot(aes(x = b_opt_mean, y = mean_igr_effect)) +
+  geom_point() +
+  geom_smooth() +
+  geom_vline(xintercept = mid_temperature, col = "red")
+```
+
+One set of simulations includes communities that have different values of the expected range of b_opt and show that this does not affect community stability to the pulse perturbation.
+
+```{r}
+#| echo: false
+expt_p7 <- readRDS(here("data/pack7/expt_communities.RDS")) |> 
+  select(-community_object)
+#community_pars_p7 <- readRDS(here("data/pack7/community_pars.RDS"))
+#dynamics <- readRDS(here("data/pack7/dynamics.RDS"))
+#species_response_traits_p7 <- readRDS(here("data/pack7/species_response_traits.RDS"))
+comm_all_p7 <- readRDS(here("data/pack7/community_measures.RDS")) |> 
+  full_join(expt_p7)
+#expl_all_p7 <- readRDS(here("data/pack7/expl_all.RDS"))
+#comm_time_stab_p7 <- readRDS(here("data/pack7/comm_time_stab.RDS"))
+```
+
+```{r}
+comm_all_p7 |> 
+  ggplot(aes(x = mean_igr_effect, y = comm_RR_AUC, col = b_opt_range)) +
+  geom_point() +
+  facet_wrap(vars(alpha_ij_sd))
+```
+
+```{r}
+comm_all_p7 |> 
+  ggplot(aes(x = b_opt_range, y = comm_RR_AUC, col = mean_igr_effect)) +
+  geom_point() +
+  facet_wrap(vars(alpha_ij_sd))
 ```
 
 ## Some individual communities
@@ -483,27 +536,7 @@ p_commstab1
 #| echo: false
 species_response_traits |> 
   ggplot(aes(x = igr_pert_effect,
-             y = species_tot_deltabm_spline)) +
-  geom_point() +
-  facet_wrap(vars(alpha_ij_sd), nrow = 4) +
-  theme(legend.position="none")
-```
-
-```{r}
-#| echo: false
-species_response_traits |> 
-  ggplot(aes(x = species_tot_deltabm_raw,
-             y = species_tot_deltabm_spline)) +
-  geom_point() +
-  facet_wrap(vars(alpha_ij_sd), nrow = 4) +
-  theme(legend.position="none")
-```
-
-```{r}
-#| echo: false
-comm_all |> 
-  ggplot(aes(x = comm_tot_deltabm_raw,
-             y = comm_tot_deltabm_spline)) +
+             y = species_RR_AUC)) +
   geom_point() +
   facet_wrap(vars(alpha_ij_sd), nrow = 4) +
   theme(legend.position="none")
@@ -528,7 +561,6 @@ comm_all |>
   facet_wrap(vars(alpha_ij_sd), nrow = 4) +
   theme(legend.position="none")
 ```
-
 
 # From Charly
 
@@ -611,5 +643,3 @@ p5+facet_wrap(~alpha_ij_sd)
 
 
 ```
-
-

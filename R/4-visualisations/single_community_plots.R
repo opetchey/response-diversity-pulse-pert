@@ -92,8 +92,7 @@ traits_table <- species_response_traits %>%
          pack == pack_oi,
          b_opt_mean == bopt_oi) |>
   select(species_id,
-         species_tot_deltabm_spline,
-         species_tot_deltabm_raw,
+         species_RR_AUC,
          igr_pert_effect) |> 
   kbl() %>%
   kable_styling()
@@ -116,7 +115,7 @@ p2 <- comm_time_stab_oi |>
 
 p3 <- comm_time_stab_oi |>
   ggplot(aes(x = Time)) +
-  geom_line(aes(y = comm_deltabm))
+  geom_line(aes(y = comm_RR))
 p_commstab1 <- p1 / p2 / p3
 
 
