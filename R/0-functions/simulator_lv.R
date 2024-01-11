@@ -60,7 +60,11 @@ simulator_lv<-function(input_com_params,
     K<-rms/(bet+delt)
     
     # main dynamics: L-V competition with temp-dependence rates
-    Ntnext<- Nt + rms*(1 - (al%*%Nt)/K)
+    myrate <- rms*(1 - (al%*%Nt)/K)
+    logNtnext<- log(Nt) + myrate
+    Ntnext=exp(logNtnext)
+     
+    #Ntnext<- Nt + Nt * rms*(1 - (al%*%Nt)/K)
     
     TimeSeries[,t+1]<- Ntnext
     

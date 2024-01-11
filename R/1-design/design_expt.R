@@ -16,7 +16,7 @@ source(here("R/0-functions/make a community.R"))
 # seq(3, 7, 1)
 alpha_ij_mean_treatment <- c(0)
 
-num_replicates <- 1; rep_names <- paste0("rep-", 1:num_replicates)
+rep_names <- paste0("rep-", 1:num_replicates)
 
 ## make experiment ----
 expt <- expand.grid(b_opt_mean = b_opt_mean_treatment,
@@ -30,7 +30,7 @@ expt <- expt %>%
 
 ## make communities ----
 S <- 10
-a_b <- 3
+a_b <- 0.3 #3
 s <- 10
 a_d <- 0 # 0.01
 z <- 0.05
@@ -55,12 +55,7 @@ saveRDS(expt, here("data", pack, "expt_communities.RDS"))
 
 
 ## Create the perturbation treatment ----
-temperature_control <- 22
-temperature_pulse <- 15
-duration_pulse <- 50
-before_pulse <- 10000
-after_pulse <- 1000
-ignore_first <- 9900
+
 temperature_treatments <- tibble(
   time = seq(0, before_pulse + duration_pulse + after_pulse, 1),
   temperature_control1 = rep(temperature_control, (before_pulse + duration_pulse + after_pulse + 1)),

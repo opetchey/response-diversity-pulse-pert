@@ -1,8 +1,5 @@
 
-# coi <- expt |> 
-#   filter(alpha_ij_sd == alpha_oi,
-#          pack == pack_oi,
-#          b_opt_mean == bopt_oi)
+
 
 min_temperature <- min(c(temperature_treatments$temperature_control,
                          temperature_treatments$temperature_pulse))
@@ -14,9 +11,11 @@ buffer <- (max_temperature - min_temperature ) / 5
 temperatures <- seq(min_temperature - buffer, max_temperature + buffer, 0.1)
 
 temp <- expt |>
-  filter(alpha_ij_sd == alpha_oi,
-         pack == pack_oi,
-         b_opt_mean == bopt_oi)
+  filter(alpha_ij_sd == 0.4,
+         #pack == pack_oi,
+         b_opt_mean == b_opt_mean_oi,
+         b_opt_range == b_opt_range_oi,
+         rep_names == rep_names_oi)
 #temp$community_object
 b_opt_i <- temp$community_object[[1]]$b_opt_i
 a_b_i <- temp$community_object[[1]]$a_b_i
@@ -62,7 +61,7 @@ p_resp_curves <- resp_curves |>
 
 
 ## Look at some of the species level data
-conn <- DBI::dbConnect(RSQLite::SQLite(), here("data/merged/dynamics.db"))
+conn <- DBI::dbConnect(RSQLite::SQLite(), here("data", pack, "dynamics.db"))
 dynamics <- tbl(conn, "dynamics")
 # dynamics_oi <- dbGetQuery(conn,
 #                           "SELECT *
@@ -71,9 +70,11 @@ dynamics <- tbl(conn, "dynamics")
 #            params = coi)
 
 dynamics_oi <- dynamics |> 
-  filter(alpha_ij_sd == alpha_oi,
-         pack == pack_oi,
-         b_opt_mean == bopt_oi) |> 
+  filter(alpha_ij_sd == alpha_ij_sd_oi,
+         #pack == pack_oi,
+         b_opt_mean == b_opt_mean_oi,
+         b_opt_range == b_opt_range_oi,
+         rep_names == rep_names_oi) |> 
   collect()
 dbDisconnect(conn)
 
@@ -87,10 +88,12 @@ p_dynamics <- dynamics_oi |>
 
 
 #| echo: false
-traits_table <- species_response_traits %>% 
-  filter(alpha_ij_sd == alpha_oi,
-         pack == pack_oi,
-         b_opt_mean == bopt_oi) |>
+traits_table <- species_measures %>% 
+  filter(alpha_ij_sd == alpha_ij_sd_oi,
+         #pack == pack_oi,
+         b_opt_mean == b_opt_mean_oi,
+         b_opt_range == b_opt_range_oi,
+         rep_names == rep_names_oi) |>
   select(species_id,
          species_RR_AUC,
          igr_pert_effect) |> 
@@ -99,9 +102,11 @@ traits_table <- species_response_traits %>%
 
 #| echo: false
 comm_time_stab_oi <- comm_time_stab |>
-  filter(alpha_ij_sd == alpha_oi,
-         pack == pack_oi,
-         b_opt_mean == bopt_oi)
+  filter(alpha_ij_sd == alpha_ij_sd_oi,
+         #pack == pack_oi,
+         b_opt_mean == b_opt_mean_oi,
+         b_opt_range == b_opt_range_oi,
+         rep_names == rep_names_oi)
 
 p1 <- comm_time_stab_oi |>
   ggplot(aes(x = Time)) +

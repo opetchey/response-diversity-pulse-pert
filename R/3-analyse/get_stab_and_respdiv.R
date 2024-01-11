@@ -1,11 +1,31 @@
-
 ## sub-sample rate
-keep_every_t <- 10
+keep_every_t <- 1
+
+
+expt <- readRDS(here("data", pack, "expt_communities.RDS"))
+
+conn_dynamics <- dbConnect(RSQLite::SQLite(), here("data", pack, "/dynamics.db"))
+#dbListTables(conn_dynamics)
+dynamics <- tbl(conn_dynamics, "dynamics")
+
+tot_biomass <- dynamics |>
+  #collect()
+  ## remove rows where biomass is 0 in both control and treatment
+  #filter((Con.M + Dist.M) != 0) |>
+  filter((Time %% keep_every_t) == 0) |> 
+  group_by(case_id, replicate_id, Time, Treatment) %>%
+  summarise(tot_ab = sum(Abundance, na.rm = T)) %>%
+  collect()
+
+
+########
+
+
 
 ## read data
-temp <- readRDS(here("data", pack, "sim_results.RDS"))
-community_pars <- temp$community_pars
-dynamics <- temp$dynamics_long
+#temp <- readRDS(here("data", pack, "sim_results.RDS"))
+#community_pars <- temp$community_pars
+#dynamics <- temp$dynamics_long
 species_igr_pert_effect <- readRDS(here("data", pack, "species_igr_pert_effect.RDS"))
 
 
@@ -15,16 +35,24 @@ species_igr_pert_effect <- readRDS(here("data", pack, "species_igr_pert_effect.R
 ## Calculate and visualise the community level stability
 ## measures
 ## First for each time point in each case
-comm_time_stab <- dynamics |>
+comm_time_stab <- tot_biomass |>
   ## remove rows where biomass is 0 in both control and treatment
   #filter((Con.M + Dist.M) != 0) |>
-  group_by(case_id, community_id, replicate_id, Time, Treatment) %>%
-  summarise(tot_ab = sum(Abundance, na.rm = T)) %>%
+  #group_by(case_id, community_id, replicate_id, Time, Treatment) %>%
+  #summarise(tot_ab = sum(Abundance, na.rm = T)) %>%
   pivot_wider(names_from = Treatment, values_from = tot_ab) %>%
   mutate(comm_LRR = log(Perturbed / Control),
          comm_RR = (Perturbed - Control) /
-           (Perturbed + Control))
+           (Perturbed + Control)) 
 
+
+## find communities with many NA values
+comms_without_nas <- comm_time_stab |> 
+  group_by(case_id) |> 
+  summarise(num = n(),
+            num_na = sum(is.na(comm_LRR))) |> 
+  filter(num_na == 0) |> 
+  pull(case_id)
 
 # comm_time_stab |>
 #   filter(case_id =="Comm-6-rep-1",
@@ -35,8 +63,9 @@ comm_time_stab <- dynamics |>
 
 ## And now across time points by auc
 comm_stab <- comm_time_stab |>
-  filter((Time %% keep_every_t) == 0) |> 
-  group_by(case_id, community_id, replicate_id) |> 
+  filter(case_id %in% comms_without_nas) |> 
+  #filter((Time %% keep_every_t) == 0) |> 
+  group_by(case_id, replicate_id) |> 
   summarise(comm_RR_AUC = my_auc_func_linear(Time, comm_RR),
             OEV = my_auc_func_linear(Time, abs(comm_RR)))
 ## I would be cautious about using splines without checking they are
@@ -48,15 +77,20 @@ comm_stab <- comm_time_stab |>
 ## Now the species level stabilities ----
 
 tot_comm_ab <- dynamics |>
+  filter(case_id %in% comms_without_nas) |> 
+  filter((Time %% keep_every_t) == 0) |> 
   ## remove rows where biomass is 0 in both control and treatment
   #filter((Con.M + Dist.M) != 0) |>
-  group_by(case_id, community_id, replicate_id, Time, Treatment) %>%
-  summarise(tot_ab = sum(Abundance, na.rm = T))
+  group_by(case_id, replicate_id, Time, Treatment) %>%
+  summarise(tot_ab = sum(Abundance, na.rm = T)) |> 
+  collect()
 
 ## calculate stabilities (absolute abundance)
 species_time_stab1 <- dynamics |>
+  filter(case_id %in% comms_without_nas) |> 
+  filter((Time %% keep_every_t) == 0) |> 
   #filter(Time > 9999 & Time < 10051) |> 
-  select(-Temperature) |> 
+  #select(-Temperature) |> 
   ## remove rows where biomass is 0 in both control and treatment
   #filter((Con.M + Dist.M) != 0) |>
   pivot_wider(names_from = Treatment, values_from = Abundance) |> 
@@ -65,14 +99,20 @@ species_time_stab1 <- dynamics |>
  #        treat.tot = sum(Perturbed)) 
   mutate(spp_RR = (Perturbed - Control)/
            (Perturbed + Control)) |> 
-  select(-Control, -Perturbed)
+  select(-Control, -Perturbed) %>%
+  collect() 
 
 ## calculate stabilities (relative abundance)
-species_time_stab2 <- dynamics |>
+temp123 <- dynamics |>
+  filter(case_id %in% comms_without_nas) |> 
+  filter((Time %% keep_every_t) == 0) |> 
+  collect()
+  
+species_time_stab2 <- temp123 %>%
   full_join(tot_comm_ab) |> 
   mutate(pi = Abundance / tot_ab) |> 
   #filter(Time > 9999 & Time < 10051) |> 
-  select(-Temperature, -Abundance, -tot_ab) |> 
+  select(-Abundance, -tot_ab) |> 
   ## remove rows where biomass is 0 in both control and treatment
   #filter((Con.M + Dist.M) != 0) |>
   pivot_wider(names_from = Treatment, values_from = pi) |> 
@@ -80,7 +120,8 @@ species_time_stab2 <- dynamics |>
   #mutate(con.tot = sum(Control),
   #        treat.tot = sum(Perturbed))
   mutate(delta_pi = Perturbed - Control) |> 
-  select(-Control, -Perturbed)
+  select(-Control, -Perturbed) |> 
+  collect()
 
 
 species_time_stab <- full_join(species_time_stab1, species_time_stab2)
@@ -92,18 +133,34 @@ species_time_stab <- full_join(species_time_stab1, species_time_stab2)
 #   summarise(species_RR_AUC = my_auc_func_linear(Time, spp_RR),
 #             species_delta_pi_AUC = my_auc_func_linear(Time, delta_pi))
 
+
+comms_without_nas <- comm_time_stab |> 
+  group_by(case_id) |> 
+  summarise(num = n(),
+            num_na = sum(is.na(comm_LRR))) |> 
+  filter(num_na == 0) |> 
+  pull(case_id)
+
+
+temp <- species_time_stab |> 
+  group_by(case_id, Species_ID) |> 
+  summarise(num = n(),
+            num_na = sum(is.na(spp_RR))) |> 
+  filter(num_na != 0)
+
+
+
 species_stab <- species_time_stab |>
-  filter((Time %% keep_every_t) == 0) |> 
-  group_by(case_id, community_id, replicate_id, Species_ID) |> 
+  filter(!(case_id %in% temp$case_id & Species_ID %in% temp$Species_ID)) |> 
+  #filter((Time %% keep_every_t) == 0) |> 
+  group_by(case_id, replicate_id, Species_ID) |> 
   summarise(species_RR_AUC = my_auc_func_linear(Time, spp_RR),
             species_delta_pi_AUC = my_auc_func_linear(Time, delta_pi))
-
-
 
 ## Calculate community level indicies based on
 ## species level traits
 comm_indicies <- species_stab |> 
-  group_by(community_id, replicate_id, case_id) |> 
+  group_by(replicate_id, case_id) |> 
   summarise(mean_species_RR_AUC = mean(species_RR_AUC),
             var_species_RR_AUC = var(species_RR_AUC),
             mean_species_delta_pi_AUC = mean(species_delta_pi_AUC),
@@ -119,7 +176,8 @@ igr_respdiv <- species_igr_pert_effect |>
 
 ## merge with comm stability measures 
 comm_all <- full_join(comm_stab, comm_indicies) |> 
-  full_join(igr_respdiv)
+  full_join(igr_respdiv) |> 
+  full_join(expt)
 
 saveRDS(comm_all, here("data", pack, "community_measures.RDS"))
 
@@ -131,5 +189,6 @@ species_igr_pert_effect <-
   mutate(species_id = str_replace(species_id, "-", ""))
 species_stab <- species_stab |> 
   rename(species_id = Species_ID)
-species_all <- full_join(species_igr_pert_effect, species_stab)
+species_all <- full_join(species_igr_pert_effect, species_stab) |> 
+  full_join(expt)
 saveRDS(species_all, here("data", pack, "species_measures.RDS"))

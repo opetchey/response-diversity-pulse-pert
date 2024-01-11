@@ -5,3 +5,5 @@
 data/
 reports/main-report_cache/
 reports/main-report_files/
+*.RDS
+*.db

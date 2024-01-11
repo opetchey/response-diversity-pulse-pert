@@ -130,7 +130,7 @@ The context of our entire study is a pulse perturbation. Temperature is constant
 #| echo: false
 temperature_treatments <- readRDS(here("data/pack1/temperature_treatments.RDS"))
 temperature_treatments |>
-  filter(time > 9900) |> 
+  filter(time > 990) |> 
   ggplot(aes(x = time)) +
   geom_line(aes(y = temperature_control), col="black", linewidth = 3) +
   geom_line(aes(y = temperature_pulse), col="red", linewidth = 1)
@@ -181,13 +181,19 @@ Another measure was the sum of the absolute effect size (OEV, Overall Ecological
 
 ```{r}
 #| echo: false
-expt <- readRDS(here("data/merged/expt.RDS"))
-community_pars <- readRDS(here("data/merged/community_pars.RDS"))
-#dynamics <- readRDS(here("data/merged/dynamics.RDS"))
-species_response_traits <- readRDS(here("data/merged/species_response_traits.RDS"))
-comm_all <- readRDS(here("data/merged/comm_all.RDS"))
-expl_all <- readRDS(here("data/merged/expl_all.RDS"))
-comm_time_stab <- readRDS(here("data/merged/comm_time_stab.RDS"))
+pack <- "pack1"
+expt <- readRDS(here("data", pack, "expt_communities.RDS"))
+community_pars <- readRDS(here("data", pack, "expt_communities.RDS"))
+
+conn_dynamics <- dbConnect(RSQLite::SQLite(), here("data", pack, "/dynamics.db"))
+dynamics <- tbl(conn_dynamics, "dynamics")
+
+species_measures <- readRDS(here("data", pack, "species_measures.RDS"))
+
+comm_all <- readRDS(here("data", pack, "community_measures.RDS"))
+expl_all <- readRDS(here("data", pack, "expl_all.RDS"))
+
+comm_time_stab <- readRDS(here("data", pack, "comm_time_stab.RDS"))
 ```
 
 ## Explanatory power
@@ -197,7 +203,7 @@ And here we show how much variability in community stability is explained by the
 ```{r}
 #| echo: false
 expl_all_long <- expl_all %>%
-  pivot_longer(names_to = "variable", values_to = "rsq", cols = 3:10) %>%
+  pivot_longer(names_to = "variable", values_to = "rsq", cols = 2:9) %>%
   separate(variable, into = c("junk1", "commstab_type", "trait_type", "summary_type", "summary_subtype")) %>%
   select(-junk1)
 ```
@@ -316,7 +322,8 @@ comm_all |>
 #| fig-width: 8
 #| fig-height: 8
 comm_all |> 
-  ggplot(aes(x = mean_igr_effect, y = mean_species_RR_AUC)) +
+  ggplot(aes(x = mean_igr_effect,
+             y = comm_RR_AUC)) +
   geom_point() +
   facet_wrap(vars(alpha_ij_sd), ncol = 5, scales = "free_y") +
   theme(legend.position="none") +
@@ -397,26 +404,26 @@ One set of simulations includes communities that have different values of the ex
 
 ```{r}
 #| echo: false
-expt_p7 <- readRDS(here("data/pack7/expt_communities.RDS")) |> 
+expt_p <- readRDS(here("data", pack, "expt_communities.RDS")) |> 
   select(-community_object)
 #community_pars_p7 <- readRDS(here("data/pack7/community_pars.RDS"))
 #dynamics <- readRDS(here("data/pack7/dynamics.RDS"))
 #species_response_traits_p7 <- readRDS(here("data/pack7/species_response_traits.RDS"))
-comm_all_p7 <- readRDS(here("data/pack7/community_measures.RDS")) |> 
-  full_join(expt_p7)
+comm_all_p <- readRDS(here("data", pack, "community_measures.RDS")) |> 
+  full_join(expt_p)
 #expl_all_p7 <- readRDS(here("data/pack7/expl_all.RDS"))
 #comm_time_stab_p7 <- readRDS(here("data/pack7/comm_time_stab.RDS"))
 ```
 
 ```{r}
-comm_all_p7 |> 
+comm_all_p |> 
   ggplot(aes(x = mean_igr_effect, y = comm_RR_AUC, col = b_opt_range)) +
   geom_point() +
   facet_wrap(vars(alpha_ij_sd))
 ```
 
 ```{r}
-comm_all_p7 |> 
+comm_all_p |> 
   ggplot(aes(x = b_opt_range, y = comm_RR_AUC, col = mean_igr_effect)) +
   geom_point() +
   facet_wrap(vars(alpha_ij_sd))
@@ -430,14 +437,16 @@ Examples 4 has relatively weak interspecific interaction, and example 5 has rela
 
 ### Example 1
 
-```{r}
+```{r c2222}
 #| echo: false
-alpha_oi <- 0 
-pack_oi <- "pack1"
-bopt_oi <- 17.0
+alpha_ij_sd_oi <- 0 
+#pack_oi <- "pack1"
+b_opt_mean_oi <- 17
+b_opt_range_oi <- 5
+rep_names_oi <- "rep-1"
 ```
 
-**No inter-specific interactions (sd(alpha_ij) = `r alpha_oi`) and low average optimum temperature (mean(b_opt) = `r bopt_oi`), so the pulse has positive effect on intrinsic growth rate of most species.**
+**No inter-specific interactions (sd(alpha_ij) = `r alpha_ij_sd_oi`) and low average optimum temperature (mean(b_opt) = `r b_opt_mean_oi`), so the pulse has positive effect on intrinsic growth rate of most species.**
 
 ```{r}
 source(here("R/4-visualisations/single_community_plots.R"))
@@ -451,12 +460,15 @@ p_commstab1
 
 ```{r}
 #| echo: false
-alpha_oi <- 0 
-pack_oi <- "pack1"
-bopt_oi <- 21.0
+alpha_ij_sd_oi <- 0 
+#pack_oi <- "pack1"
+b_opt_mean_oi <- 20
+b_opt_range_oi <- 5
+rep_names_oi <- "rep-1"
+
 ```
 
-**No inter-specific interactions (sd(alpha_ij) = `r alpha_oi`) and low average optimum temperature (mean(b_opt) = `r bopt_oi`), so the pulse has negative effect on intrinsic growth rate of most species.**
+**No inter-specific interactions (sd(alpha_ij) = `r alpha_ij_sd_oi`) and high average optimum temperature (mean(b_opt) = `r b_opt_mean_oi`), so the pulse has negative effect on intrinsic growth rate of most species.**
 
 ```{r}
 source(here("R/4-visualisations/single_community_plots.R"))
@@ -470,12 +482,14 @@ p_commstab1
 
 ```{r}
 #| echo: false
-alpha_oi <- 0 
-pack_oi <- "pack1"
-bopt_oi <- 19.0
+alpha_ij_sd_oi <- 0 
+#pack_oi <- "pack1"
+b_opt_mean_oi <- 19
+b_opt_range_oi <- 5
+rep_names_oi <- "rep-1"
 ```
 
-**No inter-specific interactions (sd(alpha_ij) = `r alpha_oi`) and intermediate average optimum temperature (mean(b_opt) = `r bopt_oi`), so the pulse has negative effect on intrinsic growth rate of some species, and positive effect on others.**
+**No inter-specific interactions (sd(alpha_ij) = `r alpha_ij_sd_oi`) and intermediate average optimum temperature (mean(b_opt) = `r b_opt_mean_oi`), so the pulse has negative effect on intrinsic growth rate of some species, and positive effect on others.**
 
 ```{r}
 source(here("R/4-visualisations/single_community_plots.R"))
@@ -489,12 +503,14 @@ p_commstab1
 
 ```{r}
 #| echo: false
-alpha_oi <- 0.1 
-pack_oi <- "pack1"
-bopt_oi <- 19.0
+alpha_ij_sd_oi <- 0.1
+#pack_oi <- "pack1"
+b_opt_mean_oi <- 19
+b_opt_range_oi <- 5
+rep_names_oi <- "rep-1"
 ```
 
-**"Weak" inter-specific interactions (sd(alpha_ij) = `r alpha_oi`) and intermediate average optimum temperature (mean(b_opt) = `r bopt_oi`), so the pulse has negative effect on intrinsic growth rate of some species, and positive effect on others.**
+**"Weak" inter-specific interactions (sd(alpha_ij) = `r alpha_ij_sd_oi`) and intermediate average optimum temperature (mean(b_opt) = `r b_opt_mean_oi`), so the pulse has negative effect on intrinsic growth rate of some species, and positive effect on others.**
 
 ```{r}
 source(here("R/4-visualisations/single_community_plots.R"))
@@ -508,12 +524,14 @@ p_commstab1
 
 ```{r}
 #| echo: false
-alpha_oi <- 0.3
-pack_oi <- "pack2"
-bopt_oi <- 19.0
+alpha_ij_sd_oi <- 0.3
+#pack_oi <- "pack1"
+b_opt_mean_oi <- 19
+b_opt_range_oi <- 5
+rep_names_oi <- "rep-1"
 ```
 
-**"Strong\* inter-specific interactions (sd(alpha_ij) = `r alpha_oi`) and intermediate average optimum temperature (mean(b_opt) = `r bopt_oi`), so the pulse has negative effect on intrinsic growth rate of some species, and positive effect on others.**
+**"Strong\* inter-specific interactions (sd(alpha_ij) = `r alpha_ij_sd_oi`) and intermediate average optimum temperature (mean(b_opt) = `r b_opt_mean_oi`), so the pulse has negative effect on intrinsic growth rate of some species, and positive effect on others.**
 
 ```{r}
 source(here("R/4-visualisations/single_community_plots.R"))
@@ -534,7 +552,7 @@ p_commstab1
 
 ```{r}
 #| echo: false
-species_response_traits |> 
+species_measures |> 
   ggplot(aes(x = igr_pert_effect,
              y = species_RR_AUC)) +
   geom_point() +
@@ -565,6 +583,7 @@ comm_all |>
 # From Charly
 
 ```{r}
+#| eval: false
 
 Fdiv <- readRDS(here('data/merged/Fdiv_responseDiversity.RDS'))
 
