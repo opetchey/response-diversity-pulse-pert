@@ -20,14 +20,16 @@ my_auc_func_spline <- function(x, y) {
 
 my_auc_func_linear <- function(x, y) {
   
-  if(length(x) > 2) {
+  if(length(x) >= 10 & sum(!is.na(y)) >= 10) {
+    x <- x[!is.na(y)]
+    y <- y[!is.na(y)]
     result <- MESS::auc(x,
                         y,
                         type = c("linear"),
                         absolutearea = FALSE)
   }
   
-  if(length(x) < 3) {
+  if(length(x) < 10 | sum(!is.na(y)) < 10) {
     result <- NA
   }
   result

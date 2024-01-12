@@ -130,7 +130,7 @@ The context of our entire study is a pulse perturbation. Temperature is constant
 #| echo: false
 temperature_treatments <- readRDS(here("data/pack1/temperature_treatments.RDS"))
 temperature_treatments |>
-  filter(time > 990) |> 
+  filter(time > 490) |> 
   ggplot(aes(x = time)) +
   geom_line(aes(y = temperature_control), col="black", linewidth = 3) +
   geom_line(aes(y = temperature_pulse), col="red", linewidth = 1)
@@ -203,7 +203,7 @@ And here we show how much variability in community stability is explained by the
 ```{r}
 #| echo: false
 expl_all_long <- expl_all %>%
-  pivot_longer(names_to = "variable", values_to = "rsq", cols = 2:9) %>%
+  pivot_longer(names_to = "variable", values_to = "rsq", cols = 3:14) %>%
   separate(variable, into = c("junk1", "commstab_type", "trait_type", "summary_type", "summary_subtype")) %>%
   select(-junk1)
 ```
@@ -417,14 +417,14 @@ comm_all_p <- readRDS(here("data", pack, "community_measures.RDS")) |>
 
 ```{r}
 comm_all_p |> 
-  ggplot(aes(x = mean_igr_effect, y = comm_RR_AUC, col = b_opt_range)) +
+  ggplot(aes(x = b_opt_mean, y = comm_RR_AUC, col = b_opt_range)) +
   geom_point() +
   facet_wrap(vars(alpha_ij_sd))
 ```
 
 ```{r}
 comm_all_p |> 
-  ggplot(aes(x = b_opt_range, y = comm_RR_AUC, col = mean_igr_effect)) +
+  ggplot(aes(x = b_opt_range, y = comm_RR_AUC, col = b_opt_mean)) +
   geom_point() +
   facet_wrap(vars(alpha_ij_sd))
 ```
@@ -540,6 +540,37 @@ p_dynamics
 traits_table
 p_commstab1
 ```
+
+
+### Code for checking a specific case
+
+```{r}
+case_to_check <- "Comm-1241-rep-1"
+these_ <- expt[expt$case_id == case_to_check,]
+
+
+#| echo: false
+alpha_ij_sd_oi <- these_$alpha_ij_sd
+#pack_oi <- "pack1"
+b_opt_mean_oi <- these_$b_opt_mean
+b_opt_range_oi <- these_$b_opt_range
+rep_names_oi <- these_$rep_names
+```
+
+`r case_to_check`
+
+```{r}
+source(here("R/4-visualisations/single_community_plots.R"))
+p_resp_curves
+p_dynamics
+traits_table
+p_commstab1
+```
+
+
+
+
+
 
 # Appendix
 

@@ -41,29 +41,44 @@ dynamics <- tbl(conn, "dynamics")
 
 ## Here the code for calculating the explanatory power ----
 
-expt_details <- expt |> 
-  select(case_id, alpha_ij_sd)
+# expt_details <- expt |> 
+#   select(case_id, alpha_ij_sd)
+# 
+# nrow(na.omit(expt))
+# nrow(na.omit(comm_all))
+# 
+# sumry <- comm_all |>
+#   group_by(alpha_ij_sd, replicate_id) |> 
+#   summarise(num_non_nas = sum(!is.na(OEV)))
 
 expl <- comm_all %>%
   full_join(expt_details) |> 
   ungroup() %>%
-  nest_by(alpha_ij_sd) %>%
+  nest_by(alpha_ij_sd, replicate_id) %>%
   mutate(model1 = list(gam(comm_RR_AUC ~ s(mean_species_RR_AUC), data = data)),
-         model2 = list(gam(comm_RR_AUC ~ s(mean_igr_effect), data = data)),
-         model3 = list(gam(comm_RR_AUC ~ s(RD_diss_igr_effect), data = data)),
-         model4 = list(gam(comm_RR_AUC ~ s(RD_div_igr_effect), data = data)),
-         model5 = list(gam(OEV ~ s(mean_species_RR_AUC), data = data)),
-         model6 = list(gam(OEV ~ s(mean_igr_effect), data = data)),
-         model7 = list(gam(OEV ~ s(RD_diss_igr_effect), data = data)),
-         model8 = list(gam(OEV ~ s(RD_div_igr_effect), data = data))) %>%
+         model2 = list(gam(comm_RR_AUC ~ s(RD_diss_species_RR_AUC), data = data)),
+         model3 = list(gam(comm_RR_AUC ~ s(RD_div_species_RR_AUC), data = data)),
+         model4 = list(gam(comm_RR_AUC ~ s(mean_igr_effect), data = data)),
+         model5 = list(gam(comm_RR_AUC ~ s(RD_diss_igr_effect), data = data)),
+         model6 = list(gam(comm_RR_AUC ~ s(RD_div_igr_effect), data = data)),
+         model7 = list(gam(OEV ~ s(mean_species_RR_AUC), data = data)),
+         model8 = list(gam(OEV ~ s(RD_diss_species_RR_AUC), data = data)),
+         model9 = list(gam(OEV ~ s(RD_div_species_RR_AUC), data = data)),
+         model10 = list(gam(OEV ~ s(mean_igr_effect), data = data)),
+         model11 = list(gam(OEV ~ s(RD_diss_igr_effect), data = data)),
+         model12 = list(gam(OEV ~ s(RD_div_igr_effect), data = data))) %>%
   summarise(rsq_rawcommstab_realised_mean = summary(model1)$r.sq,
-            rsq_rawcommstab_fundamental_mean = summary(model2)$r.sq,
-            rsq_rawcommstab_fundamental_RD_diss = summary(model3)$r.sq,
-            rsq_rawcommstab_fundamental_RD_div = summary(model4)$r.sq,
-            rsq_OEV_realised_mean = summary(model5)$r.sq,
-            rsq_OEV_fundamental_mean = summary(model6)$r.sq,
-            rsq_OEV_fundamental_RD_diss = summary(model7)$r.sq,
-            rsq_OEV_fundamental_RD_div = summary(model8)$r.sq)
+            rsq_rawcommstab_realised_RD_diss = summary(model2)$r.sq,
+            rsq_rawcommstab_realised_RD_div = summary(model3)$r.sq,
+            rsq_rawcommstab_fundamental_mean = summary(model4)$r.sq,
+            rsq_rawcommstab_fundamental_RD_diss = summary(model5)$r.sq,
+            rsq_rawcommstab_fundamental_RD_div = summary(model6)$r.sq,
+            rsq_OEV_realised_mean = summary(model7)$r.sq,
+            rsq_OEV_realised_RD_diss = summary(model8)$r.sq,
+            rsq_OEV_realised_RD_div = summary(model9)$r.sq,
+            rsq_OEV_fundamental_mean = summary(model10)$r.sq,
+            rsq_OEV_fundamental_RD_diss = summary(model11)$r.sq,
+            rsq_OEV_fundamental_RD_div = summary(model12)$r.sq)
 
 
 

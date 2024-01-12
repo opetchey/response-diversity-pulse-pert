@@ -75,6 +75,8 @@ Tcel_pertm<-matrix(Tcel_pert,nrow=1)
 
 #plot(t(Tcel_pertm))
 
+i <- 2597
+
 for(i in 1:nrun){
   print(i)
   S <- expt$community_object[[i]]$S
