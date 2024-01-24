@@ -14,7 +14,6 @@ source(here("R/0-functions/make a community.R"))
 #b_opt_mean_treatment <- seq(17.5, 19.5, 1)
 #b_opt_range_treatment <- c(5) ## used in packs 1-6
 # seq(3, 7, 1)
-alpha_ij_mean_treatment <- c(0)
 
 rep_names <- paste0("rep-", 1:num_replicates)
 

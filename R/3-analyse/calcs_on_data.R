@@ -3,7 +3,6 @@ library(tidyverse)
 library(mgcv)
 library(broom)
 
-
 expt <- readRDS(here("data", pack, "expt_communities.RDS"))
 community_pars <- readRDS(here("data", pack, "expt_communities.RDS"))
 species_measures <- readRDS(here("data", pack, "species_measures.RDS"))
@@ -41,15 +40,30 @@ dynamics <- tbl(conn, "dynamics")
 
 ## Here the code for calculating the explanatory power ----
 
-# expt_details <- expt |> 
-#   select(case_id, alpha_ij_sd)
+expt_details <- expt |> 
+  select(case_id, alpha_ij_sd)
 # 
 # nrow(na.omit(expt))
 # nrow(na.omit(comm_all))
 # 
 # sumry <- comm_all |>
-#   group_by(alpha_ij_sd, replicate_id) |> 
-#   summarise(num_non_nas = sum(!is.na(OEV)))
+#  group_by(alpha_ij_sd, replicate_id) |> 
+# summarise(num_non_nas = sum(!is.na(OEV)))
+
+#comm_all %>%
+# ggplot(., aes(x = RD_div_species_RR_AUC, y = comm_RR_AUC))+
+# geom_point()+
+# facet_wrap(~alpha_ij_sd)
+
+#expl <- comm_all %>%
+#   full_join(expt_details) |> 
+#  ungroup() %>%
+# filter(alpha_ij_sd == 0.5) #%>%
+
+#mod3<- gam(comm_RR_AUC ~ s(RD_div_species_RR_AUC), data = expl)
+#summary(mod3)$r.sq
+
+
 
 expl <- comm_all %>%
   full_join(expt_details) |> 

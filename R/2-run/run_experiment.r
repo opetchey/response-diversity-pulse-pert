@@ -42,14 +42,14 @@ Time<-temperature_treatments$time
 nrun<-nrow(expt)
 control_res<-data.frame(community_id = expt$community_id,
                         case_id = expt$case_id,
-                B_opts = NA*numeric(nrun),
-                Other_species_pars = NA*numeric(nrun),
-                Replicate_ID = expt$rep_names,
-                Treatment = "Control",
-                Time=NA,
-                Temperature =NA,
-                Species_ID=NA,
-                Abundance = NA)
+                        B_opts = NA*numeric(nrun),
+                        Other_species_pars = NA*numeric(nrun),
+                        Replicate_ID = expt$rep_names,
+                        Treatment = "Control",
+                        Time=NA,
+                        Temperature =NA,
+                        Species_ID=NA,
+                        Abundance = NA)
 control_res$Time<-I(list(Time))
 control_res$Temperature<-I(list(Tcel_control))
 Tcel_controlm<-matrix(Tcel_control,nrow=1)
@@ -75,7 +75,7 @@ Tcel_pertm<-matrix(Tcel_pert,nrow=1)
 
 #plot(t(Tcel_pertm))
 
-i <- 2597
+i <- 104
 
 for(i in 1:nrun){
   print(i)
@@ -86,8 +86,8 @@ for(i in 1:nrun){
   input <- expt$community_object[[i]]
   
   ## for testing
-  input_com_params = input 
-  TcelSeries = Tcel_controlm
+  # input_com_params = input 
+  #TcelSeries = Tcel_controlm
   
   spts <- simulator_lv(input_com_params = input,
                        TcelSeries = Tcel_controlm,
@@ -122,6 +122,7 @@ for(i in 1:nrun){
   # control_res$Abundance[i]<-I(list(spts))
   # 
   
+  ##simulations  perturbed
   #input<-expt$community_object[[i]]
   spts<-simulator_lv(input_com_params = input,
                      TcelSeries=Tcel_pertm,
