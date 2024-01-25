@@ -5,7 +5,7 @@ my_auc_func_spline <- function(x, y) {
   if(length(x) > 2) {
     result <- MESS::auc(x,
                   y,
-                  from = min(0, na.rm = TRUE),
+                  from = min(x, na.rm = TRUE),
                   to = max(x, na.rm = TRUE),
                   type = c("spline"),
                   absolutearea = FALSE,

@@ -6,7 +6,6 @@ library(cowplot)
 
 
   ### read data ###
-pack <- "pack3"
 expt <- readRDS(here("data", pack, "expt_communities.RDS"))
 speciesData <- readRDS(here("data", pack, "species_measures.RDS"))
 communityData <- readRDS(here("data", pack, "community_measures.RDS"))

@@ -75,17 +75,19 @@ p2 <- expl_all_long %>%
   ggtitle(paste("Realised niche-based community measures\n", other_pars_text)) +
   scale_y_continuous(breaks = seq(0, 1, 0.2))
 
-ggsave(here("reports", paste0(pack, "-quick-results.pdf")),
+ggsave(here("reports", paste0(pack, "-quick-results.pdf")), width = 8, height = 8,
        p1 / p2)
 
-
+### indivdiual dynamics ###
 dynamics1 <- dynamics %>%
   #filter(Treatment == "Control") %>%
   collect()
 
 dynamics1 %>%
-  filter(case_id == "Comm-698-rep-1") %>%
+  filter(case_id == "Comm-2667-rep-1") %>%
   ggplot(aes(x = Time, y = Abundance, col = Species_ID)) +
   geom_line() +
   facet_wrap(~ Treatment)
+
+
   
