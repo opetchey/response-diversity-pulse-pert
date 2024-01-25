@@ -14,7 +14,7 @@ source(here("R/0-functions/Ross_et_al_functions.R"))
 ## sub-sample rate
 keep_every_t <- 1
 
-pack<-'pack2'
+#pack<-'pack2'
 expt <- readRDS(here("data", pack, "expt_communities.RDS"))
 
 conn_dynamics <- dbConnect(RSQLite::SQLite(), here("data", pack, "/dynamics.db"))
@@ -118,20 +118,15 @@ tot_comm_ab <- dynamics |>
   collect()
 
 ## calculate stabilities (absolute abundance)
+
+
+threshold <- other_pars$spp_RR_calc_threshold ## needed for database to have access
 species_time_stab1 <- dynamics |>
-  #filter(case_id %in% comms_without_nas) |> 
   filter((Time %% keep_every_t) == 0) |> 
-  #filter(Time > 9999 & Time < 10051) |> 
-  #select(-Temperature) |> 
-  ## remove rows where biomass is 0 in both control and treatment
-  #filter((Con.M + Dist.M) != 0) |>
   pivot_wider(names_from = Treatment, values_from = Abundance) |> 
-  # group_by(case_id, community_id) |> 
-  #mutate(con.tot = sum(Control),
-  #        treat.tot = sum(Perturbed)) 
   ## threshold for calculating spp_RR ****IMPORTANT
-  mutate(spp_RR = ifelse((Perturbed + Control) > 1,
-                         (Perturbed - Control) / (Perturbed + Control), #remove data point (setting it to NA) when species abundance is very low
+  mutate(spp_RR = ifelse((Perturbed + Control) > threshold,
+                         (Perturbed - Control) / (Perturbed + Control),
                          NA)) |> 
   select(-Control, -Perturbed) %>%
   collect() 

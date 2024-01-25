@@ -27,33 +27,25 @@ after_pulse <- 200
 ignore_first <- 490
 
 ## pack1, the real thing - this will take some time to run and analyse
-pack <- "pack4"
-b_opt_mean_treatment <- seq(15, 22, 0.5) # 18.5 halfway
-b_opt_range_treatment <- seq(3, 7, 0.5) ## used in packs 1-6
-alpha_ij_sd_treatment <- round(seq(0, 0.5, 0.025), 3)
-alpha_ij_mean_treatment <- c(0)
-num_replicates <- 5
-
-## pack2 for testing
 pack <- "pack2"
-b_opt_mean_treatment <- seq(15, 22, 1) # 18.5 halfway
-b_opt_range_treatment <- seq(3, 7, 2) ## used in packs 1-6
-alpha_ij_sd_treatment <- round(seq(0, 0.5, 0.1), 3)
-alpha_ij_mean_treatment <- c(0)
-num_replicates <- 2
-
-## pack3, only negative alpha
-pack <- "pack3"
 b_opt_mean_treatment <- seq(15, 22, 0.5) # 18.5 halfway
 b_opt_range_treatment <- seq(3, 7, 0.5) ## used in packs 1-6
-alpha_ij_sd_treatment <- round(seq(0, 0.45, 0.025), 3)
-alpha_ij_mean_treatment <- c(0.5)
-num_replicates <- 5
+alpha_ij_mean_treatment <- c(0)
+alpha_ij_sd_treatment <- round(seq(0, 0.5, 0.025), 3)
+spp_RR_calc_threshold <- 1
+num_replicates <- 1
+other_pars <- list()
+other_pars$spp_RR_calc_threshold <- 1
+other_pars$interactions <- "only_comp"
+
+
 
 ## data folder
 dir.create(here("data", pack))
 
-pack <- 'pack3'
+saveRDS(other_pars, here("data", pack, "other_pars.RDS"))
+
+#pack <- 'pack3'
 # Design experiment
 source(here("R/1-design/design_expt.R"))
 
@@ -69,8 +61,12 @@ source(here("R/3-analyse/get_stab_and_respdiv.R"))
 ## Getting the explanatory powers
 source(here("R/3-analyse/calcs_on_data.R"))
 
-## plotting ##
-source(here('R/5-from-charly/plots_simulations.R'))
+## plotting and making html report
+source(here("R", "4-visualisations", "quick-graph-main-result.r"))
+quarto::quarto_render(input = here("reports", "main-report.qmd"),
+                      output_file = paste0("main-report-", pack, ".html"))
+
+#source(here('R/5-from-charly/plots_simulations.R'))
 ###############################################################################
 ## Here is how to add new diversity measures. Its possibly still not so clear, so let me know if something seems amiss or unclear. ----
 ## 1. Add to the calculation in the file `R/3-analyse/get_stab_and_respdiv.R`.

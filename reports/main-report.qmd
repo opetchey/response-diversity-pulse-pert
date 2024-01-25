@@ -194,9 +194,17 @@ comm_all <- readRDS(here("data", pack, "community_measures.RDS"))
 expl_all <- readRDS(here("data", pack, "expl_all.RDS"))
 
 comm_time_stab <- readRDS(here("data", pack, "comm_time_stab.RDS"))
+
+other_pars <- readRDS(here("data", pack, "other_pars.RDS"))
+
 ```
 
 ## Explanatory power
+
+```{r}
+other_pars
+pack
+```
 
 And here we show how much variability in community stability is explained by the community mean of the species response traits, for realised niche-based response traits, and for fundamental niche-based response traits. How much variability explained is that of a GAM.
 
@@ -541,7 +549,6 @@ traits_table
 p_commstab1
 ```
 
-
 ### Code for checking a specific case
 
 ```{r}
@@ -566,11 +573,6 @@ p_dynamics
 traits_table
 p_commstab1
 ```
-
-
-
-
-
 
 # Appendix
 

@@ -20,9 +20,11 @@ make_a_community <- function(S,
   
   z_i <- rep(z, S)
   
-  temp <- rnorm(S*S,
+  ## we added abs to the next line so all interaction strengths are positive, which means
+  ## all interactions are competitive
+  temp <- abs(rnorm(S*S,
                 mean = alpha_ij_mean,
-                sd = alpha_ij_sd)
+                sd = alpha_ij_sd))
   alpha_ij <- matrix(temp, S, S)
   diag(alpha_ij) <-1 # see the change - I put the diag term intra specific competition 1 so that it would be always higher than the interspecific competition
   diag(alpha_ij) <- diag(alpha_ij) * intrafactor # intrafactor currently set as 1
