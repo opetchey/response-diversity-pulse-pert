@@ -7,10 +7,14 @@
 ## This species-level data is saved in the file **species_measures.RDS**
 
 
+## source any required user defined functions
+source(here("R/0-functions/my_auc.R"))
+source(here("R/0-functions/Ross_et_al_functions.R"))
+
 ## sub-sample rate
 keep_every_t <- 1
 
-
+pack<-'pack2'
 expt <- readRDS(here("data", pack, "expt_communities.RDS"))
 
 conn_dynamics <- dbConnect(RSQLite::SQLite(), here("data", pack, "/dynamics.db"))
@@ -122,22 +126,28 @@ species_time_stab1 <- dynamics |>
   ## remove rows where biomass is 0 in both control and treatment
   #filter((Con.M + Dist.M) != 0) |>
   pivot_wider(names_from = Treatment, values_from = Abundance) |> 
- # group_by(case_id, community_id) |> 
+  # group_by(case_id, community_id) |> 
   #mutate(con.tot = sum(Control),
- #        treat.tot = sum(Perturbed)) 
- ## threshold for calculating spp_RR ****IMPORTANT
+  #        treat.tot = sum(Perturbed)) 
+  ## threshold for calculating spp_RR ****IMPORTANT
   mutate(spp_RR = ifelse((Perturbed + Control) > 1,
-                         (Perturbed - Control) / (Perturbed + Control),
+                         (Perturbed - Control) / (Perturbed + Control), #remove data point (setting it to NA) when species abundance is very low
                          NA)) |> 
   select(-Control, -Perturbed) %>%
   collect() 
+
+
+dummy <- dynamics%>%
+  filter(case_id %in% c('Comm-100-rep-1')) %>%
+  collect()
+
 
 ## calculate stabilities (relative abundance)
 temp123 <- dynamics |>
   #filter(case_id %in% comms_without_nas) |> 
   filter((Time %% keep_every_t) == 0) |> 
   collect()
-  
+
 species_time_stab2 <- temp123 %>%
   full_join(tot_comm_ab) |> 
   mutate(pi = Abundance / tot_ab) |> 

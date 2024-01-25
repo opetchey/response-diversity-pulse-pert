@@ -12,9 +12,9 @@ temperature_treatments <- readRDS(here("data", pack, "temperature_treatments.RDS
 ## Get control and perturbation temperatures
 ## Assume the perturbation is a decrease in temperature
 perturbation_temperature <- min(c(temperature_treatments$temperature_control,
-                         temperature_treatments$temperature_pulse))
+                                  temperature_treatments$temperature_pulse))
 control_temperature <- max(c(temperature_treatments$temperature_control,
-                         temperature_treatments$temperature_pulse))
+                             temperature_treatments$temperature_pulse))
 #min_max_temps <- tibble(temperature = c(min_temperature, max_temperature),
 #                        y = c(0,0))
 #buffer <- (max_temperature - min_temperature ) / 5
@@ -27,13 +27,13 @@ for(i in 1:length(expt$case_id)) {
   comm_pars_i <- expt$community_object[i][[1]]
   
   if(i == 1)
-  species_pars <- tibble(case_id = rep(expt$case_id[i], length(comm_pars_i$b_opt_i)),
-    species_id = paste0("Spp-", 1:length(comm_pars_i$b_opt_i)),
-    b_opt_i = comm_pars_i$b_opt_i,
-                       a_b_i = comm_pars_i$a_b_i,
-                       s_i = comm_pars_i$s_i,
-                       a_d_i = comm_pars_i$a_d_i,
-                       z_i = comm_pars_i$z_i)
+    species_pars <- tibble(case_id = rep(expt$case_id[i], length(comm_pars_i$b_opt_i)),
+                           species_id = paste0("Spp-", 1:length(comm_pars_i$b_opt_i)),
+                           b_opt_i = comm_pars_i$b_opt_i,
+                           a_b_i = comm_pars_i$a_b_i,
+                           s_i = comm_pars_i$s_i,
+                           a_d_i = comm_pars_i$a_d_i,
+                           z_i = comm_pars_i$z_i)
   if(i > 1)
     species_pars <- rbind(species_pars,
                           tibble(case_id = rep(expt$case_id[i], length(comm_pars_i$b_opt_i)),
@@ -43,7 +43,7 @@ for(i in 1:length(expt$case_id)) {
                                  s_i = comm_pars_i$s_i,
                                  a_d_i = comm_pars_i$a_d_i,
                                  z_i = comm_pars_i$z_i))
-    
+  
 }
 
 species_igr_pert_effect <- species_pars |> 
@@ -56,11 +56,11 @@ species_igr_pert_effect <- species_pars |>
                                               z_i,
                                               control_temperature),
          perturbation_igr = intrinsic_growth_rate2(a_b_i,
-                                              b_opt_i,
-                                              s_i,
-                                              a_d_i,
-                                              z_i,
-                                              perturbation_temperature),
+                                                   b_opt_i,
+                                                   s_i,
+                                                   a_d_i,
+                                                   z_i,
+                                                   perturbation_temperature),
          igr_pert_effect = perturbation_igr - control_igr) |> 
   select(case_id, species_id, igr_pert_effect)
 
