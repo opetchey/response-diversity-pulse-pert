@@ -27,7 +27,7 @@ speciesData %>%
   theme_bw()+
   theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="bold",colour="black",angle=0,hjust=0.4))+
   theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="bold",colour="black"))
-ggsave(plot = last_plot(), file = here('output/ModelContributions_subset.png'), width = 15, height = 15)
+ggsave(plot = last_plot(), file = here('output/ModelContributions_001.png'), width = 15, height = 15)
 
 str(communityData)
 
