@@ -131,10 +131,15 @@ species_time_stab1 <- dynamics |>
   select(-Control, -Perturbed) %>%
   collect() 
 
-
-dummy <- dynamics%>%
-  filter(case_id %in% c('Comm-100-rep-1')) %>%
-  collect()
+#calculate how many species have very low / high abundance
+#dummy <- dynamics %>%
+ # filter((Time %% keep_every_t) == 0) |> 
+ # pivot_wider(names_from = Treatment, values_from = Abundance) |> 
+ # filter(Time >490,
+  #       Control & Perturbed <10^-10) %>%
+ # ungroup()%>%  
+  #mutate(spp_RR = (Perturbed - Control) / (Perturbed + Control)) %>%
+  #collect() 
 
 
 ## calculate stabilities (relative abundance)

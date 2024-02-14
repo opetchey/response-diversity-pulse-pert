@@ -128,7 +128,7 @@ The context of our entire study is a pulse perturbation. Temperature is constant
 
 ```{r}
 #| echo: false
-temperature_treatments <- readRDS(here("data/pack1/temperature_treatments.RDS"))
+temperature_treatments <- readRDS(here("data/pack2/temperature_treatments.RDS"))
 temperature_treatments |>
   filter(time > 490) |> 
   ggplot(aes(x = time)) +
@@ -181,7 +181,7 @@ Another measure was the sum of the absolute effect size (OEV, Overall Ecological
 
 ```{r}
 #| echo: false
-pack <- "pack1"
+pack <- "pack2"
 expt <- readRDS(here("data", pack, "expt_communities.RDS"))
 community_pars <- readRDS(here("data", pack, "expt_communities.RDS"))
 
@@ -396,7 +396,7 @@ We can go a little further, and predict that *response balance* (i.e., `mean_spe
 
 ```{r}
 #| echo: false
-temperature_treatments <- readRDS(here("data/pack1/temperature_treatments.RDS"))
+temperature_treatments <- readRDS(here("data/pack2/temperature_treatments.RDS"))
 control_temperature <- max(temperature_treatments$temperature_control)
 pulse_temperature <- min(temperature_treatments$temperature_pulse)
 mid_temperature <- (control_temperature + pulse_temperature) / 2
@@ -448,7 +448,7 @@ Examples 4 has relatively weak interspecific interaction, and example 5 has rela
 ```{r c2222}
 #| echo: false
 alpha_ij_sd_oi <- 0 
-#pack_oi <- "pack1"
+#pack_oi <- "pack2"
 b_opt_mean_oi <- 17
 b_opt_range_oi <- 5
 rep_names_oi <- "rep-1"
@@ -469,7 +469,7 @@ p_commstab1
 ```{r}
 #| echo: false
 alpha_ij_sd_oi <- 0 
-#pack_oi <- "pack1"
+#pack_oi <- "pack2"
 b_opt_mean_oi <- 20
 b_opt_range_oi <- 5
 rep_names_oi <- "rep-1"
@@ -491,7 +491,7 @@ p_commstab1
 ```{r}
 #| echo: false
 alpha_ij_sd_oi <- 0 
-#pack_oi <- "pack1"
+#pack_oi <- "pack2"
 b_opt_mean_oi <- 19
 b_opt_range_oi <- 5
 rep_names_oi <- "rep-1"
@@ -512,7 +512,7 @@ p_commstab1
 ```{r}
 #| echo: false
 alpha_ij_sd_oi <- 0.1
-#pack_oi <- "pack1"
+#pack_oi <- "pack2"
 b_opt_mean_oi <- 19
 b_opt_range_oi <- 5
 rep_names_oi <- "rep-1"
@@ -533,7 +533,7 @@ p_commstab1
 ```{r}
 #| echo: false
 alpha_ij_sd_oi <- 0.3
-#pack_oi <- "pack1"
+#pack_oi <- "pack2"
 b_opt_mean_oi <- 19
 b_opt_range_oi <- 5
 rep_names_oi <- "rep-1"
@@ -558,7 +558,7 @@ these_ <- expt[expt$case_id == case_to_check,]
 
 #| echo: false
 alpha_ij_sd_oi <- these_$alpha_ij_sd
-#pack_oi <- "pack1"
+#pack_oi <- "pack2"
 b_opt_mean_oi <- these_$b_opt_mean
 b_opt_range_oi <- these_$b_opt_range
 rep_names_oi <- these_$rep_names
