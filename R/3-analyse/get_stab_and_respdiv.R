@@ -200,13 +200,15 @@ species_stab <- species_time_stab |>
 
 ## Calculate response diversity from species dynamics
 comm_indicies <- species_stab |> 
+  mutate(abs.RR = abs(species_RR_AUC))|>
   group_by(replicate_id, case_id) |> 
   summarise(mean_species_RR_AUC = mean(species_RR_AUC, na.rm = TRUE),
             var_species_RR_AUC = var(species_RR_AUC, na.rm = TRUE),
             RD_diss_species_RR_AUC = resp_div(species_RR_AUC, sign_sens = FALSE, na.rm = TRUE),
             RD_div_species_RR_AUC = resp_div(species_RR_AUC, sign_sens = TRUE, na.rm = TRUE),
-            mean_species_delta_pi_AUC = mean(species_delta_pi_AUC),
-            var_species_delta_pi_AUC = var(species_delta_pi_AUC))
+            mean_species_abs_RR = mean(abs.RR),
+            RD_diss_species_RR_abs = resp_div(abs.RR, sign_sens = FALSE, na.rm = TRUE),
+            RD_div_species_RR_abs = resp_div(abs.RR, sign_sens = TRUE, na.rm = TRUE))
 
 
 

@@ -14,6 +14,36 @@ communityData <- readRDS(here("data", pack, "community_measures.RDS"))
 str(speciesData)
 str(communityData)
 
+
+#### absolute RD ####
+v1<-communityData %>%
+  mutate(absRD.diss = abs(RD_diss_species_RR_AUC),
+         absRD.div = abs(RD_div_species_RR_AUC)) %>%
+  ggplot(., aes ( x = absRD.diss, y = OEV, alpha = alpha_ij_sd))+
+  geom_hline(yintercept=0)+
+  geom_vline(xintercept = 0)+
+  geom_point()+
+  facet_wrap(~alpha_ij_sd, ncol = 5)+ # scale_y_continuous(limits = c(-0.00002,0.00004), breaks = c(-0.00002,-0.00001,0,0.00001, 0.00002,0.00004))+
+  theme_bw()+
+  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="bold",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="bold",colour="black"))
+
+v2<-communityData %>%
+  mutate(absRD.diss = abs(RD_diss_species_RR_AUC),
+         absRD.div = abs(RD_div_species_RR_AUC)) %>%
+  ggplot(., aes ( x = absRD.div, y = OEV, alpha = alpha_ij_sd))+
+  geom_hline(yintercept=0)+
+  geom_vline(xintercept = 0)+
+  geom_point()+
+  facet_wrap(~alpha_ij_sd, ncol = 5)+ # scale_y_continuous(limits = c(-0.00002,0.00004), breaks = c(-0.00002,-0.00001,0,0.00001, 0.00002,0.00004))+
+  theme_bw()+
+  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="bold",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="bold",colour="black"))
+
+plot_grid(v1,v2, labels = c('a)', 'b)'))
+ggsave(last_plot(), width = 15, height = 8, 
+       file= here('output/OEV_absRD.png'))
+
 ### species contributions ###
 sample(speciesData$community_id, 10)
 speciesData %>%
@@ -35,6 +65,7 @@ str(communityData)
 
 p2<-communityData %>%
   ggplot(., aes ( x = mean_igr_effect, y = comm_RR_AUC))+
+  geom_hline(yintercept=0)+
   geom_point(alpha = 0.3)+
   facet_wrap(~alpha_ij_sd, ncol = 5)+
   labs(x = 'Mean IGR effect', y = 'Relative OEV')+
@@ -45,6 +76,7 @@ p2<-communityData %>%
 
 p3<-communityData %>%
   ggplot(., aes ( x = RD_diss_igr_effect, y = comm_RR_AUC))+
+  geom_hline(yintercept=0)+
   geom_point(alpha = 0.3)+
   facet_wrap(~alpha_ij_sd, ncol = 5)+
   labs(x = 'Dissimilarity', y = 'Relative OEV')+
@@ -55,6 +87,7 @@ p3<-communityData %>%
 
 p4<-communityData %>%
   ggplot(., aes ( x = RD_div_igr_effect, y = comm_RR_AUC))+
+  geom_hline(yintercept=0)+
   geom_point(alpha = 0.3)+
   facet_wrap(~alpha_ij_sd, ncol = 5)+
   labs(x = 'Divergence', y = 'Relative OEV')+
@@ -72,6 +105,7 @@ ggsave(plot = last_plot(), file = here('output/IGR_Traits_Instab.png'), width = 
 
 p5<-communityData %>%
   ggplot(., aes ( x = mean_species_RR_AUC, y = comm_RR_AUC))+
+  geom_hline(yintercept=0)+
   geom_point(alpha = 0.3)+
   facet_wrap(~alpha_ij_sd, ncol = 5)+
   labs(x = 'Mean Realised Response', y = 'Relative OEV')+
@@ -83,6 +117,7 @@ p5<-communityData %>%
 
 p6<-communityData %>%
   ggplot(., aes ( x = RD_diss_igr_effect, y = comm_RR_AUC))+
+  geom_hline(yintercept=0)+
   geom_point(alpha = 0.3)+
   facet_wrap(~alpha_ij_sd, ncol = 5)+
   labs(x = 'Dissimilarity', y = 'Relative OEV')+
@@ -93,6 +128,7 @@ p6<-communityData %>%
 
 p7<-communityData %>%
   ggplot(., aes ( x = RD_div_species_RR_AUC, y = comm_RR_AUC))+
+  geom_hline(yintercept=0)+
   geom_point(alpha = 0.3)+
   facet_wrap(~alpha_ij_sd, ncol = 5)+
   labs(x = 'Divergence', y = 'Relative OEV')+
@@ -101,13 +137,14 @@ p7<-communityData %>%
   theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'none')
 
-cowplot:: plot_grid(p5,p6,p7, labels = c('a)', 'b)', 'c)', 'd)', 'e)', 'f)', 'g)', 'h)'), rel_heights = c(2,2), ncol = 2)
+cowplot:: plot_grid(p6,p7,p5, labels = c('a)', 'b)', 'c)', 'd)', 'e)', 'f)', 'g)', 'h)'), rel_heights = c(2,2), ncol = 2)
 ggsave(plot = last_plot(), file = here('output/Realised_Traits_Instab.png'), width = 15, height = 15)
 
 
 #### Fundamental response traits correlations ####
 p8<-communityData %>%
   ggplot(., aes ( x = mean_igr_effect, y = RD_diss_igr_effect ))+
+  geom_vline(xintercept = 0)+
   geom_point(alpha = 0.3)+
   facet_wrap(~alpha_ij_sd, ncol = 5)+
   labs(y = 'Dissimilarity', x = 'Mean IGR effect')+
@@ -119,6 +156,7 @@ p8<-communityData %>%
 
 p9<-communityData %>%
   ggplot(., aes ( x = mean_igr_effect, y = RD_div_igr_effect ))+
+  geom_vline(xintercept = 0)+
   geom_point(alpha = 0.3)+
   facet_wrap(~alpha_ij_sd, ncol = 5)+
   labs(y = 'Divergence', x = 'Mean IGR effect')+
@@ -136,6 +174,7 @@ ggsave(plot = last_plot(), file = here('output/IGR_Traits.png'), width = 15, hei
 
 p10<-communityData %>%
   ggplot(., aes ( x = mean_species_RR_AUC, y = RD_diss_species_RR_AUC, alpha =alpha_ij_sd ))+
+  geom_vline(xintercept = 0)+
   geom_point(alpha = 0.3)+
   facet_wrap(~alpha_ij_sd, ncol = 6)+
   theme_bw()+
@@ -146,6 +185,7 @@ p10<-communityData %>%
 
 p11<-communityData %>%
   ggplot(., aes ( x = mean_species_RR_AUC, y = RD_div_species_RR_AUC, alpha =alpha_ij_sd ))+
+  geom_vline(xintercept = 0)+
   geom_point(alpha = 0.3)+
    facet_wrap(~alpha_ij_sd, ncol = 6)+
   theme_bw()+
@@ -154,5 +194,40 @@ p11<-communityData %>%
   theme(legend.position = 'bottom')
 
 cowplot:: plot_grid(p10,p11+theme(legend.position = 'none'),ncol = 2, labels = c('a)', 'b)'))
-ggsave(plot = last_plot(), file = 'IGR_Realised_Traits.png', width = 15, height = 8)
+ggsave(plot = last_plot(), file = here('output/Realised_Traits.png'), width = 15, height = 8)
 
+####OEV####
+p6<-communityData %>%
+  ggplot(., aes ( x = RD_diss_igr_effect, y = OEV))+
+ # geom_hline(yintercept=0)+
+  geom_point(alpha = 0.3)+
+  facet_wrap(~alpha_ij_sd, ncol = 5)+
+  labs(x = 'Dissimilarity', y = 'OEV')+
+  theme_bw()+
+  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(legend.position = 'none')
+
+p7<-communityData %>%
+  ggplot(., aes ( x = RD_div_species_RR_AUC, y = OEV))+
+ # geom_hline(yintercept=0)+
+  geom_point(alpha = 0.3)+
+  facet_wrap(~alpha_ij_sd, ncol = 5)+
+  labs(x = 'Divergence', y = 'Relative OEV')+
+  theme_bw()+
+  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(legend.position = 'none')
+
+cowplot:: plot_grid(p6,p7, labels = c('a)', 'b)', 'c)', 'd)', 'e)', 'f)', 'g)', 'h)'), rel_heights = c(2,2), ncol = 2)
+ggsave(plot = last_plot(), file = here('output/RealisedRD_OEV.png'), width = 15, height = 15)
+
+
+
+#### Exploring low divergence #### 
+str(communityData)
+div<- communityData %>% 
+  filter(RD_div_species_RR_AUC == 0 & OEV>20) %>%
+  left_join(., speciesData)
+
+Comm<-filter(div, case_id == 'Comm-10003-rep-4')
