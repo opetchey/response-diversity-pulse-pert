@@ -45,6 +45,11 @@ expl_all_long <- expl_all %>%
 other_pars
 other_pars_text <- paste(names(other_pars),other_pars)
 
+expl_all_long$summary_subtype[is.na(expl_all_long$summary_subtype) ] <- 'response'
+expl_all_long$summary_subtype[expl_all_long$summary_subtype== 'diss' ] <- 'dissimilarity'
+expl_all_long$summary_subtype[expl_all_long$summary_subtype== 'div' ] <- 'divergence'
+
+expl_all_long$commstab_type[expl_all_long$commstab_type == 'rawcommstab']<- 'Relative OEV'
 
 p1 <- expl_all_long %>%
   filter(trait_type == "fundamental") %>%
@@ -54,11 +59,12 @@ p1 <- expl_all_long %>%
   geom_point() +
   geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs")) +
   xlab("Strength of interspecific interactions") +
-  ylab("Proportion of variation in community stability\nexplained by two types of response trait") +
+  ylab("Explained variation in community stability") +
   #scale_color_manual(labels = c("Fundamental trait", "Realised trait"), values = c("blue", "red", "black")) +
-  labs(colour = "Type of measure") +
-  ggtitle(paste("Fundamental niche-based community measures\n", other_pars_text)) +
-  scale_y_continuous(breaks = seq(0, 1, 0.2))
+  labs(colour = "Type of measure", title = 'Fundamental species traits') +
+ # ggtitle(paste("Fundamental niche-based community measures\n", other_pars_text)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.2))+
+  theme_bw()
 
 
 p2 <- expl_all_long %>%
@@ -69,14 +75,17 @@ p2 <- expl_all_long %>%
   geom_point() +
   geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs")) +
   xlab("Strength of interspecific interactions") +
-  ylab("Proportion of variation in community stability\nexplained by two types of response trait") +
+  ylab("Explained variation in community stability") +
   #scale_color_manual(labels = c("Fundamental trait", "Realised trait"), values = c("blue", "red", "black")) +
-  labs(colour = "Type of measure") +
-  ggtitle(paste("Realised niche-based community measures\n", other_pars_text)) +
-  scale_y_continuous(breaks = seq(0, 1, 0.2))
+  labs(colour = "Type of measure", title='Realised responses') +
+  #ggtitle(paste("Realised niche-based community measures\n", other_pars_text)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.2))+
+  theme_bw()
 
-ggsave(here("reports", paste0(pack, "-quick-results.pdf")), width = 8, height = 8,
-       p1 / p2)
+cowplot::plot_grid(p1,p2, ncol = 1, labels = c('a)', 'b)'))
+ggsave(plot = last_plot(), file = here('output', paste0(pack, "-quick-results.pdf")), width = 8, height = 8)
+#ggsave(here("reports", paste0(pack, "-quick-results.pdf")), width = 8, height = 8,
+ #      p1 / p2)
 
 ### indivdiual dynamics ###
 dynamics1 <- dynamics %>%

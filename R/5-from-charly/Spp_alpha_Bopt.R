@@ -22,6 +22,15 @@ species_measures <- readRDS(here("data", pack, "species_measures.RDS"))
 
 
 
+### explore ###
+
+ggplot(comm_all, aes ( x= b_opt_mean, y = comm_RR_AUC))+
+  geom_hline(yintercept = 0)+
+  geom_point(alpha = 0.3)+
+  facet_wrap(~alpha_ij_sd)
+
+ggsave(plot = last_plot(), file = here('output/topt.png'), width = 7, height = 8)
+
 column_names <- paste0("Spp", 1:10)
 
 
@@ -58,8 +67,7 @@ flattened_df <- alphaij %>%
          Spp8 = V8,
          Spp9 = V9,
          Spp10 = V10)%>%
-  mutate(
-    species_column = rep(column_names, each = length(unique(case_id)))) %>%
+  mutate(species_column = rep(column_names, each = length(unique(case_id)))) %>%
   pivot_longer(c(Spp1,Spp2,Spp3,Spp4,Spp5,Spp6,Spp7,Spp8,Spp9,Spp10), names_to=c('Gegners' ), values_to='competition_value')
 
 mean_alphaij <- flattened_df %>%
@@ -78,7 +86,7 @@ ggplot(all_spp_info, aes(y = mean_competitiveness, x = b_opt_i ))+
   #geom_smooth(method = 'lm')+
   facet_wrap(~alpha_ij_sd)
 
-ggsave(plot = last_plot(), file = here('output/competitiveness_topt.pdf'), width = 7, height = 8)
+#ggsave(plot = last_plot(), file = here('output/competitiveness_topt.pdf'), width = 7, height = 8)
 
 #### now merge with AUCs and igr to see which species benefit and suffer ####
 AUC_info <- left_join(all_spp_info, species_measures)
@@ -108,9 +116,9 @@ pD<-ggplot(AUC_info, aes(x = b_opt_i, y = igr_pert_effect ))+
 pD
 
 cowplot::plot_grid(pA, pB, ncol = 2, labels = c('(a)', '(b)', '(c)', '(d)'))
-ggsave(plot = last_plot(), file = here('output/competitiveness_topt_realisedResp.pdf'), width = 14, height = 8)
+ggsave(plot = last_plot(), file = here('output/competitiveness_topt_realisedResp.png'), width = 14, height = 8)
 
 cowplot::plot_grid(pC, pD, ncol = 2, labels = c('(a)', '(b)', '(c)', '(d)'))
-ggsave(plot = last_plot(), file = here('output/competitiveness_topt_igrEffect.pdf'), width = 14, height = 8)
+ggsave(plot = last_plot(), file = here('output/competitiveness_topt_igrEffect.png'), width = 14, height = 8)
 
 
