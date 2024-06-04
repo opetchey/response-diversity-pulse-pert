@@ -27,7 +27,8 @@ species_measures <- readRDS(here("data", pack, "species_measures.RDS"))
 ggplot(comm_all, aes ( x= b_opt_mean, y = comm_RR_AUC))+
   geom_hline(yintercept = 0)+
   geom_point(alpha = 0.3)+
-  facet_wrap(~alpha_ij_sd)
+  facet_wrap(~alpha_ij_sd)+
+  theme_bw()
 
 ggsave(plot = last_plot(), file = here('output/topt.png'), width = 7, height = 8)
 
@@ -83,8 +84,9 @@ all_spp_info <- left_join(mean_alphaij, unnest) %>%
 
 ggplot(all_spp_info, aes(y = mean_competitiveness, x = b_opt_i ))+
   geom_point(alpha = 0.3)+
-  #geom_smooth(method = 'lm')+
-  facet_wrap(~alpha_ij_sd)
+  labs(x ='Topt', y = 'Mean Competitveness')+
+  facet_wrap(~alpha_ij_sd)+
+  theme_bw()
 
 #ggsave(plot = last_plot(), file = here('output/competitiveness_topt.pdf'), width = 7, height = 8)
 
@@ -94,31 +96,39 @@ AUC_info <- left_join(all_spp_info, species_measures)
 pA<-ggplot(AUC_info, aes(x = mean_competitiveness, y = species_RR_AUC ))+
   geom_point(alpha = 0.3)+
   geom_hline(yintercept = 0)+
-  facet_wrap(~alpha_ij_sd)
+  labs(x ='Competitiveness', y = 'Species realised responses')+
+  facet_wrap(~alpha_ij_sd)+
+  theme_bw()
 pA
 
 pB<-ggplot(AUC_info, aes(x = b_opt_i, y = species_RR_AUC ))+
   geom_point(alpha = 0.3)+
   geom_hline(yintercept = 0)+
-  facet_wrap(~alpha_ij_sd)
+  facet_wrap(~alpha_ij_sd)+
+  labs(x ='Topt', y = 'Species realised response')+
+  theme_bw()
 pB
 
 pC<-ggplot(AUC_info, aes(x = mean_competitiveness, y = igr_pert_effect ))+
   geom_point(alpha = 0.3)+
   geom_hline(yintercept = 0)+
-  facet_wrap(~alpha_ij_sd)
+  labs(x ='Competitiveness', y = 'Species fundamental traits')+
+  facet_wrap(~alpha_ij_sd)+
+  theme_bw()
 pC
 
 pD<-ggplot(AUC_info, aes(x = b_opt_i, y = igr_pert_effect ))+
   geom_point(alpha = 0.3)+
   geom_hline(yintercept = 0)+
-  facet_wrap(~alpha_ij_sd)
+  labs(x ='Topt', y = 'Species fundamental traits')+
+  facet_wrap(~alpha_ij_sd)+
+  theme_bw()
 pD
 
 cowplot::plot_grid(pA, pB, ncol = 2, labels = c('(a)', '(b)', '(c)', '(d)'))
-ggsave(plot = last_plot(), file = here('output/competitiveness_topt_realisedResp.png'), width = 14, height = 8)
+ggsave(plot = last_plot(), file = here('output/competitiveness_topt_realisedResp.pdf'), width = 14, height = 8)
 
 cowplot::plot_grid(pC, pD, ncol = 2, labels = c('(a)', '(b)', '(c)', '(d)'))
-ggsave(plot = last_plot(), file = here('output/competitiveness_topt_igrEffect.png'), width = 14, height = 8)
+ggsave(plot = last_plot(), file = here('output/competitiveness_topt_igrEffect.pdf'), width = 14, height = 8)
 
 
