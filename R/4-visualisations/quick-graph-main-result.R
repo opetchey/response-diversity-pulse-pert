@@ -81,9 +81,8 @@ p2 <- expl_all_long %>%
   theme_bw()
 
 ggarrange(p1,p2, ncol = 2, labels = c('(a)', '(b)'), common.legend = T, legend = "bottom")
-ggsave(plot = last_plot(), file = here('output', paste0(pack, "-quick-results.pdf")), width = 9, height = 5)
-#ggsave(here("reports", paste0(pack, "-quick-results.pdf")), width = 8, height = 8,
- #      p1 / p2)
+ggsave(plot = last_plot(), file = here('output', paste0(pack, "-quick-results-Fig4.pdf")), width = 9, height = 5)
+
 
 ### indivdiual dynamics ###
 dynamics1 <- dynamics %>%
@@ -97,6 +96,6 @@ dynamics1 %>%
   geom_line() +
   facet_wrap(~ Species_ID)+
   theme_bw()
-ggsave(plot = last_plot(), file = here('output/SpeciesDynamics.tiff'), width = 8, height = 6)
+ggsave(plot = last_plot(), file = here('output/Appendix_FigS_SpeciesDynamics.pdf'), width = 8, height = 6)
 
   
