@@ -25,8 +25,8 @@ speciesData %>%
   labs(x = 'Absolute Contribution', y = 'Relative Contribution')+
   facet_wrap(~alpha_ij_sd, ncol = 5)+ # scale_y_continuous(limits = c(-0.00002,0.00004), breaks = c(-0.00002,-0.00001,0,0.00001, 0.00002,0.00004))+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="bold",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="bold",colour="black"))
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="bold",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="bold",colour="black"))
 #ggsave(plot = last_plot(), file = here('output/ModelContributions_001.png'), width = 15, height = 15)
 
 str(communityData)
@@ -39,10 +39,10 @@ p2<-communityData %>%
   geom_hline(yintercept=0)+
   geom_point(alpha = 0.5, color = '#F8766D')+
   facet_wrap(~alpha_ij_sd, ncol = 1)+
-  labs(x = 'Mean Response Trait', y = 'OEV')+
+  labs(x = 'Mean Fundamental Response', y = 'OEV')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'none')
 
 p3<-communityData %>%
@@ -51,10 +51,10 @@ p3<-communityData %>%
   geom_hline(yintercept=0)+
   geom_point(alpha = 0.5, color = '#00BA38')+
   facet_wrap(~alpha_ij_sd, ncol = 1)+
-  labs(x = 'Response Dissimilarity', y = 'OEV')+
+  labs(x = 'Fundamental Response Dissimilarity', y = 'OEV')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'none')
 
 p4<-communityData %>%
@@ -63,15 +63,15 @@ p4<-communityData %>%
   geom_hline(yintercept=0)+
   geom_point(alpha = 0.5, color = '#619CFF')+
   facet_wrap(~alpha_ij_sd, ncol = 1)+
-  labs(x = 'Response Divergence', y = 'OEV')+
+  labs(x = 'Fundamental Response Divergence', y = 'OEV')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'bottom')
 
 legend_a<-get_legend(p4)
-cowplot:: plot_grid(p2, p3,p4+theme(legend.position = 'none'),labels = c('(a)', '(b)', '(c)', 'd)'), ncol = 3)
-ggsave(plot = last_plot(), file = here('output/Figure2_IGR_Instab.png'), width = 10, height = 8)
+cowplot:: plot_grid(p2, p3,p4+theme(legend.position = 'none'),labels = c(' ', ' ', ' ', 'd)'), ncol = 3)
+ggsave(plot = last_plot(), file = here('output/Figure2_IGR_Instab.png'), width = 10.5, height = 8.5)
 
 
 #### Realised response traits and community stability ####
@@ -84,8 +84,8 @@ p5<-communityData %>%
   facet_wrap(~alpha_ij_sd, ncol = 1)+
   labs(x = 'Mean Realised Response', y = 'OEV')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'none')
 
 
@@ -95,10 +95,10 @@ p6<-communityData %>%
   geom_hline(yintercept=0)+
   geom_point(alpha = 0.5, color = '#00BA38')+
   facet_wrap(~alpha_ij_sd, ncol = 1)+
-  labs(x = 'Response Dissimilarity', y = 'OEV')+
+  labs(x = 'Realised Response Dissimilarity', y = 'OEV')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'none')
 
 p7<-communityData %>%
@@ -107,14 +107,14 @@ p7<-communityData %>%
   geom_hline(yintercept=0)+
   geom_point(alpha = 0.5, color = '#619CFF')+
   facet_wrap(~alpha_ij_sd, ncol = 1)+
-  labs(x = 'Response Divergence', y = 'OEV')+
+  labs(x = 'Realised Response Divergence', y = 'OEV')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'none')
 
-cowplot:: plot_grid(p5,p6,p7, labels = c('(a)', '(b)', '(c)'), rel_heights = c(2,2), ncol = 3)
-ggsave(plot = last_plot(), file = here('output/Figure3_Realised_Traits_Instab.pdf'), width = 10, height = 8)
+cowplot:: plot_grid(p5,p6,p7, labels = c(' ', ' ', ' '), rel_heights = c(2,2), ncol = 3)
+ggsave(plot = last_plot(), file = here('output/Figure3_Realised_Traits_Instab.png'), width = 10, height = 8)
 
 #### Supplementary Figures ####
 p2<-communityData %>%
@@ -122,10 +122,10 @@ p2<-communityData %>%
   geom_hline(yintercept=0)+
   geom_point(alpha = 0.5, color = '#F8766D')+
   facet_wrap(~alpha_ij_sd, ncol = 5)+
-  labs(x = 'Mean IGR effect', y = 'OEV')+
+  labs(x = 'Mean Fundamental Response', y = 'OEV')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'none')
 
 p3<-communityData %>%
@@ -133,10 +133,10 @@ p3<-communityData %>%
   geom_hline(yintercept=0)+
   geom_point(alpha = 0.5, color = '#00BA38')+
   facet_wrap(~alpha_ij_sd, ncol = 5)+
-  labs(x = 'Response Dissimilarity', y = 'OEV')+
+  labs(x = 'Fundamental Response Dissimilarity', y = 'OEV')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'none')
 
 p4<-communityData %>%
@@ -144,15 +144,15 @@ p4<-communityData %>%
   geom_hline(yintercept=0)+
   geom_point(alpha = 0.5, color = '#619CFF')+
   facet_wrap(~alpha_ij_sd, ncol = 5)+
-  labs(x = 'Response Divergence', y = 'OEV')+
+  labs(x = 'Fundamental Response Divergence', y = 'OEV')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'bottom')
 
 legend_a<-get_legend(p4)
 cowplot:: plot_grid(p2, p3,p4+theme(legend.position = 'none'),labels = c('(a)', '(b)', '(c)', '(d)'), ncol = 2)
-ggsave(plot = last_plot(), file = here('output/Appendix_FigS_IGR_Instab.pdf'), width = 15, height = 18)
+ggsave(plot = last_plot(), file = here('output/Appendix_FigS_IGR_Instab.png'), width = 15, height = 18)
 
 
 
@@ -163,8 +163,8 @@ p5<-communityData %>%
   facet_wrap(~alpha_ij_sd, ncol = 5)+
   labs(x = 'Mean Realised Response', y = 'OEV')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'none')
 
 
@@ -173,10 +173,10 @@ p6<-communityData %>%
   geom_hline(yintercept=0)+
   geom_point(alpha = 0.5, color = '#00BA38')+
   facet_wrap(~alpha_ij_sd, ncol = 5)+
-  labs(x = 'Response Dissimilarity', y = 'OEV')+
+  labs(x = 'Realised Response Dissimilarity', y = 'OEV')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'none')
 
 p7<-communityData %>%
@@ -184,26 +184,28 @@ p7<-communityData %>%
   geom_hline(yintercept=0)+
   geom_point(alpha = 0.5, color = '#619CFF')+
   facet_wrap(~alpha_ij_sd, ncol = 5)+
-  labs(x = 'Response Divergence', y = 'OEV')+
+  labs(x = 'Realised Response Divergence', y = 'OEV')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'none')
 
 cowplot:: plot_grid(p5,p6,p7, labels = c('(a)', '(b)', '(c)'), rel_heights = c(2,2), ncol = 2)
-ggsave(plot = last_plot(), file = here('output/Appendix_FigS_Realised_Instab.pdf'), width = 15, height = 18)
+ggsave(plot = last_plot(), file = here('output/Appendix_FigS_Realised_Instab.png'), width = 15, height = 18)
 
 
-#### Fundamental response traits correlations ####
+#### Response traits correlations ####
+
+## fundamental ##
 p8<-communityData %>%
   ggplot(., aes ( x = mean_igr_effect, y = RD_diss_igr_effect ))+
   geom_vline(xintercept = 0)+
   geom_point(alpha = 0.5)+
   facet_wrap(~alpha_ij_sd, ncol = 5)+
-  labs(y = 'Dissimilarity', x = 'Mean IGR effect')+
+  labs(y = 'Fundamental Response Dissimilarity', x = 'Mean Fundamental Response')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'none')
 
 
@@ -212,15 +214,43 @@ p9<-communityData %>%
   geom_vline(xintercept = 0)+
   geom_point(alpha = 0.5)+
   facet_wrap(~alpha_ij_sd, ncol = 5)+
-  labs(y = 'Divergence', x = 'Mean IGR effect')+
+  labs(y = 'Fundamental Response Divergence', x = 'Mean Fundamental Response')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'bottom')
 
 legend_p4 <- get_legend(p4)
 cowplot:: plot_grid(p9+theme(legend.position = 'none'),p8,ncol = 2, labels = c('(a)', '(b)', 'c)', 'd)'), rel_heights = c(2,2,0.3))
-ggsave(plot = last_plot(), file = here('output/Appendix_FigS_IGR_Traits.pdf'), width = 15, height = 8)
+ggsave(plot = last_plot(), file = here('output/Appendix_FigS_IGR_Traits.png'), width = 15, height = 8)
+
+## realised ##
+p8a<-communityData %>%
+  ggplot(., aes ( x = mean_species_RR_AUC, y = RD_diss_species_RR_AUC ))+
+  geom_vline(xintercept = 0)+
+  geom_point(alpha = 0.5)+
+  facet_wrap(~alpha_ij_sd, ncol = 5)+
+  labs(y = 'Realised Response Dissimilarity', x = 'Mean Realised Response')+
+  theme_bw()+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(legend.position = 'none')
+
+
+p9a<-communityData %>%
+  ggplot(., aes ( x = mean_species_RR_AUC, y = RD_div_species_RR_AUC ))+
+  geom_vline(xintercept = 0)+
+  geom_point(alpha = 0.5)+
+  facet_wrap(~alpha_ij_sd, ncol = 5)+
+  labs(y = 'Realised Response Divergence', x = 'Mean Realised Response')+
+  theme_bw()+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(legend.position = 'bottom')
+
+legend_p9 <- get_legend(p9a)
+cowplot:: plot_grid(p9a+theme(legend.position = 'none'),p8a,ncol = 2, labels = c('(a)', '(b)', 'c)', 'd)'), rel_heights = c(2,2,0.3))
+ggsave(plot = last_plot(), file = here('output/Appendix_FigS_Realised_Traits.png'), width = 15, height = 8)
 
 #### absolute OEV ####
 #### Fundamental responses and abs communtiy instability ####
@@ -231,10 +261,10 @@ p11<-communityData %>%
   #geom_hline(yintercept=0)+
   geom_point(alpha = 0.5, color = '#F8766D')+
   facet_wrap(~alpha_ij_sd, ncol = 1)+
-  labs(x = 'Fundamental mean response', y = 'abs(OEV)')+
+  labs(x = 'Mean Fundamental Response', y = 'abs(OEV)')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'none')
 
 p12<-communityData %>%
@@ -245,8 +275,8 @@ p12<-communityData %>%
   facet_wrap(~alpha_ij_sd, ncol = 1)+
   labs(x = 'Fundamental Response Dissimilarity', y = 'abs(OEV)')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'none')
 
 p13<-communityData %>%
@@ -257,13 +287,13 @@ p13<-communityData %>%
   facet_wrap(~alpha_ij_sd, ncol = 1)+
   labs(x = 'Fundamental Response Divergence', y = 'abs(OEV)')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'bottom')
 
 legend_a<-get_legend(p13)
 cowplot:: plot_grid(p11, p12,p13+theme(legend.position = 'none'),labels = c('(a)', '(b)', '(c)', 'd)'), ncol = 3)
-ggsave(plot = last_plot(), file = here('output/Appendix_IGR_absOEV.png'), width = 10, height = 8)
+ggsave(plot = last_plot(), file = here('output/Appendix_IGR_absOEV.png'), width = 10.5, height = 8.5)
 
 
 #### Realised responses and abs community stability ####
@@ -274,10 +304,10 @@ p14<-communityData %>%
  # geom_hline(yintercept=0)+
   geom_point(alpha = 0.5, color = '#F8766D')+
   facet_wrap(~alpha_ij_sd, ncol = 1)+
-  labs(x = 'Realised Mean Response', y = 'abs(OEV)')+
+  labs(x = 'Mean Realised Response', y = 'abs(OEV)')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'none')
 
 
@@ -289,8 +319,8 @@ p15<-communityData %>%
   facet_wrap(~alpha_ij_sd, ncol = 1)+
   labs(x = 'Realised Response Dissimilarity', y = 'abs(OEV)')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'none')
 
 p16<-communityData %>%
@@ -301,12 +331,12 @@ p16<-communityData %>%
   facet_wrap(~alpha_ij_sd, ncol = 1)+
   labs(x = 'Realised Response Divergence', y = 'abs(OEV)')+
   theme_bw()+
-  theme(axis.title.y=element_text(size=14, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
-  theme(axis.title.x=element_text(size=14,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
+  theme(axis.title.y=element_text(size=13, face="plain", colour="black",vjust=0.3),axis.text.y=element_text(size=10,face="plain",colour="black",angle=0,hjust=0.4))+
+  theme(axis.title.x=element_text(size=13,face="plain",colour="black",vjust=0),axis.text.x=element_text(size=10,face="plain",colour="black"))+
   theme(legend.position = 'none')
 
 cowplot:: plot_grid(p14,p15,p16, labels = c('(a)', '(b)', '(c)'), rel_heights = c(2,2), ncol = 3)
-ggsave(plot = last_plot(), file = here('output/Appendix_Realised_absOEV.pdf'), width = 10, height = 8)
+ggsave(plot = last_plot(), file = here('output/Appendix_Realised_absOEV.png'), width = 10, height = 8)
 
 
 #### Exploring low divergence #### 
