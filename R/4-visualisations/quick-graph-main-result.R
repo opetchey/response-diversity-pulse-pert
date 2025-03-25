@@ -84,17 +84,23 @@ ggarrange(p1,p2, ncol = 2, labels = c('(a)', '(b)'), common.legend = T, legend =
 ggsave(plot = last_plot(), file = here('output', paste0(pack, "-quick-results-Fig4.pdf")), width = 9, height = 5)
 
 
-### indivdiual dynamics ###
+### individual dynamics ###
 dynamics1 <- dynamics %>%
   #filter(Treatment == "Control") %>%
   collect()
 dynamics1$Treatment[dynamics1$Treatment == 'Perturbed']<-'Disturbed'
 
-dynamics1 %>%
-  filter(case_id == "Comm-100-rep-1" ) %>%
+### subset for plot ###
+dynamics2 <- dynamics1 %>%
+  filter(case_id == "Comm-100-rep-1" )
+
+dynamics2$fac_Species_ID <- dynamics2$Species_ID
+dynamics2$fac_Species_ID<- factor(dynamics2$fac_Species_ID, levels = c("Spp1", "Spp2","Spp3", "Spp4", "Spp5", "Spp6", "Spp7","Spp8","Spp9", "Spp10" ))
+
+dynamics2%>%
   ggplot(aes(x = Time, y = Abundance, linetype = Treatment)) +
   geom_line() +
-  facet_wrap(~ Species_ID)+
+  facet_wrap(~ fac_Species_ID)+
   theme_bw()
 ggsave(plot = last_plot(), file = here('output/Appendix_FigS_SpeciesDynamics.pdf'), width = 8, height = 6)
 
