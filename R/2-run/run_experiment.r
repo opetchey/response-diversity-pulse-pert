@@ -107,23 +107,7 @@ for(i in 1:nrun){
     mutate(Treatment = "Control")
   
   
-  
-  #plot(t(Tcel_controlm))
-  #unique(t(Tcel_controlm))
-  #matplot(spts[6400:7000,1])
-  
-  # oth<-input
-  # oth[["b_opt_i"]]<-NULL
-  # oth$bopt_mean<-expt$b_opt_mean[i]
-  # oth$bopt_range<-expt$b_opt_range[i]
-  # control_res$Other_species_pars[i]<-I(list(oth))
-  # 
-  # control_res$B_opts[i]<-I(list(input$b_opt_i))
-  # control_res$Abundance[i]<-I(list(spts))
-  # 
-  
   ##simulations  perturbed
-  #input<-expt$community_object[[i]]
   spts<-simulator_lv(input_com_params = input,
                      TcelSeries=Tcel_pertm,
                      initial_abundances = initial_abundances)
@@ -147,10 +131,7 @@ for(i in 1:nrun){
            alpha_ij_mean = expt$alpha_ij_mean[i],
            rep_names = expt$rep_names[i])
   
-  #perturbed_res$Other_species_pars[i]<-I(list(oth))
-  #perturbed_res$B_opts[i]<-I(list(input$b_opt_i))
-  #perturbed_res$Abundance[i]<-I(list(spts))
-  
+
   
   if(i == 1) {
     dbWriteTable(conn_dynamics, "dynamics", results, overwrite = TRUE)
@@ -165,64 +146,4 @@ for(i in 1:nrun){
 }
 
 
-
-# 
-# control_res$Species_ID<-I(list(colnames(spts)))
-# perturbed_res$Species_ID<-I(list(colnames(spts)))
-# allres<-rbind(control_res,
-#               perturbed_res)
-# allres<-as_tibble(allres)
-# 
-# allres <- expt %>%
-#   select(community_id, b_opt_mean, b_opt_range,
-#          alpha_ij_mean, alpha_ij_sd) %>%
-#   full_join(allres, multiple = "all")
-# 
-# 
-# 
-# 
-# community_pars <- allres %>%
-#   select(community_id, case_id, b_opt_mean, b_opt_range,
-#          B_opts,
-#          alpha_ij_mean, alpha_ij_sd,
-#          Other_species_pars, Replicate_ID) %>%
-#   unique()
-# dynamics <- allres %>%
-#   select(community_id, Replicate_ID, case_id, b_opt_mean, b_opt_range,
-#          alpha_ij_mean, alpha_ij_sd,
-#          Treatment, Time,
-#          Temperature, Species_ID, Abundance)
-# 
-# 
-# for(i in 1:nrow(dynamics)) {
-#   #i <- 1
-#   temp1 <- tibble(community_id = rep(dynamics$community_id[i], length(dynamics$Time[i][[1]])),
-#                   replicate_id = rep(dynamics$Replicate_ID[i], length(dynamics$Time[i][[1]])),
-#                   case_id = rep(dynamics$case_id[i], length(dynamics$Time[i][[1]])),
-#                   b_opt_mean = rep(dynamics$b_opt_mean[i], length(dynamics$Time[i][[1]])),
-#                   b_opt_range = rep(dynamics$b_opt_range[i], length(dynamics$Time[i][[1]])),
-#                   alpha_ij_mean = rep(dynamics$alpha_ij_mean[i], length(dynamics$Time[i][[1]])),
-#                   alpha_ij_sd = rep(dynamics$alpha_ij_sd[i], length(dynamics$Time[i][[1]])),
-#                   Treatment = rep(dynamics$Treatment[i], length(dynamics$Time[i][[1]])),
-#                   Time = dynamics$Time[i][[1]],
-#                   Temperature = dynamics$Temperature[i][[1]])
-#   temp2 <- dynamics$Abundance[i][[1]]
-#   temp <- cbind(temp1, temp2) %>%
-#     pivot_longer(names_to = "Species_ID", values_to = "Abundance",
-#                  cols = (ncol(temp1) + 1):(ncol(temp1) + ncol(temp2)))
-#   
-#   if(i == 1)
-#     dynamics_long <- temp
-#   if(i > 1)
-#     dynamics_long <- rbind(dynamics_long, temp)
-#   
-# }
-# #dynamics_long <- dynamics_long %>%
-# #  filter(Time > ignore_first)
-# 
-# 
-# ## save the results
-# all_results <- list(community_pars = community_pars,
-#                     dynamics_long = dynamics_long)
-# saveRDS(all_results, here("data", pack, "sim_results.RDS"))
 

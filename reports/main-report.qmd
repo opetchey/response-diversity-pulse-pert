@@ -1,5 +1,5 @@
 ---
-title: "Response traits and stability in the context of a pulse perturbation. Are fundamental niche- or realised niche-based response traits more informative?"
+title: "Species interactions determine the importance of response diversity for community stability to pulse disturbances"
 editor: visual
 execute: 
   echo: false
@@ -42,21 +42,14 @@ options(dplyr.summarise.inform = FALSE)
 
 # Introduction {#sec-introduction}
 
-In the context of a pulse perturbation we ask:
+In the context of a pulse disturbance we ask:
 
--   will fundamental niche-based response traits, such as those measured according to Ross et al (2023), explain variation in community stability?
--   is a realised niche-based response trait able to explain more variation in community stability?
+-   will fundamental niche-based responses, such as those measured according to Ross et al (2023), explain variation in community stability?
+-   are realised responses able to explain more variation in community stability?
 
 We explore these questions using a simulation model of a multi-species model, in which species intrinsic growth rate is a bell-shaped function of temperature, and each species can have a different temperature optimum. A pulse perturbation is created by briefly setting temperature lower than the control temperature, and then returning it to control temperature.
 
 We then manipulate the strength of inter-specific interactions and examine how that affects the explanatory power of the two types of response trait.
-
-Predictions:
-
--   Realised and fundamental niche-based response traits will provide equal and high explanatory power when there is no or very weak interspecific interactions.
--   Increase in strength of interspecific interactions will decrease the explanatory power provided by fundamental niche-based response traits.
--   Increase in strength of interspecific interactions will not decrease, or will decrease relatively slowly (compared to fundamental niche-based response traits) the explanatory power provided by realised niche-based response traits.
--   Realised niche-based response traits will provide greater explanatory (than fundamental niche-based response traits) when interspecific interactions are relatively strong.
 
 # Methods
 
@@ -122,7 +115,7 @@ species_and_community_properties %>%
 
 ## Experimental treatments
 
-### Pulse pertubation treatment
+### Pulse disturbance treatment
 
 The context of our entire study is a pulse perturbation. Temperature is constant in one treatment, and is pulse perturbed in another. For simplicity, we always make the perturbed temperature lower than the control temperature. We do not manipulate or change anything about the pulse perturbation. The graph below shows the control temperature in black and the pulse in red. Simulations are run for 10'000 time steps before the pulse is applied and run for another 1'000 after the pulse starts.
 
@@ -154,28 +147,19 @@ When we set $sd(alpha_{i,j})$ = 0 then there are no interspecific interactions. 
 
 ## Analyses
 
-### Species response traits
+### Species responses
 
-We calculated two types of species response trait. First was a response trait based on the temperature response curve of a species (i.e., as in [Ross et al (2023)](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.14087)). For this trait, we calculated the effect of the perturbation on intrinsic growth rate (perturbation temperature intrinsic growth rate - control temperature intrinsic growth rate). This is analogous to the calculating the first derivative (slope) of the temperature response curve.
+We calculated two types of species responses. First was the species fundamental response based on the temperature response curve of a species (i.e., as in [Ross et al (2023)](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.14087)). For this, we calculated the effect of the perturbation on intrinsic growth rate (perturbation temperature intrinsic growth rate - control temperature intrinsic growth rate). This is analogous to the calculating the first derivative (slope) of the temperature response curve.
 
-Second was a response trait based on the observed response of the species to the pulse perturbation in the community context. Hence this response trait depends on the direct effect of the pulse on a species, and also the indirect effects via other species in the community.
+Second was a realised response based on the observed response of the species to the pulse perturbation in the community context. Hence this response depends on the direct effect of the pulse on a species, and also the indirect effects via other species in the community.
 
 ### Community response diversity
 
-Currently we calculate:
-
--   IGR-effect trait mean, variance, dissimilarity response diversity, and divergence response diversity.
--   Species AUC trait mean and variance.
+Response diversity can be measured in several ways, including with the two measures response dissimilarity and response divergence (Ross et al., 2023), alongside the mean species response. Response diversity was assessed using two complementary components: the dissimilarity metric and the divergence metric (Ross et al., 2023). Both measures of response diversity were assessed from fundamental species responses (IGR effect), i.e. fundamental response diversity and from species realised responses (AUC.RR), i.e. realised response diversity. Currently we calculate:
 
 ### Community stability
 
-This was calculated as the effect of the pulse perturbation on the total community biomass. This effect varied through time (e.g., often decreased monotonically after the pulse ended). The effect was calculated as the control - perturbed abundance and could conceivably be sometimes positive and sometimes negative. Examples of the dynamics of total biomass in control and perturbed treatments are given in the Appendix. A schematic figure is just below.
-
-In one measure of community stability, we took the sum (over time) of the effect. If the effect was always positive, the summed effect would be positive and if the effect was always negative then the summed effect would be negative. A small (close to zero) summed effect could result from a balance of positive and negative effects, or just very small but consistent positive (or negative) effects. Stability is greatest when the summed effect is zero. More negative and more positive values imply lower stability. We call this raw community stability.
-
-Another measure was the sum of the absolute effect size (OEV, Overall Ecological Vulnerability [Pablo et al 2021](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/1365-2745.13804). This will only be small (closer to zero) when the perturbation has a consistently small effect (positive, or negative, or mix of positive and negative). A mix of large positive and large positive effect would lead to a large value of this measure.
-
-![community stability schematic](assets/community_stability_methods.png){width="80%"}
+This was calculated as the effect of the pulse perturbation on the total community biomass. This effect varied through time (e.g., often decreased monotonically after the pulse ended). The effect was calculated as the control - perturbed abundance and could conceivably be sometimes positive and sometimes negative. To measure community stability, we used the Overall Ecological Vulnerability index (OEV, [Urrutia-Cordero et al., 2021](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/1365-2745.13804)).
 
 # Results
 
@@ -199,111 +183,9 @@ other_pars <- readRDS(here("data", pack, "other_pars.RDS"))
 
 ```
 
-## Explanatory power
+## Species responses and community stability
 
-```{r}
-other_pars
-pack
-```
-
-And here we show how much variability in community stability is explained by the community mean of the species response traits, for realised niche-based response traits, and for fundamental niche-based response traits. How much variability explained is that of a GAM.
-
-```{r}
-#| echo: false
-expl_all_long <- expl_all %>%
-  pivot_longer(names_to = "variable", values_to = "rsq", cols = 3:14) %>%
-  separate(variable, into = c("junk1", "commstab_type", "trait_type", "summary_type", "summary_subtype")) %>%
-  select(-junk1)
-```
-
-```{r}
-#| echo: false
-#| eval: false
-expl_all_long %>%
-  filter(commstab_type == "rawcommstab", summary_type == "mean") %>%
-  ggplot(aes(x = alpha_ij_sd, y = rsq, col = `trait_type`)) +
-  geom_point() +
-  geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs")) +
-  xlab("Strength of interspecific interactions") +
-  ylab("Proportion of variation in community stability\nexplained by two types of response trait") +
-  #scale_color_manual(labels = c("Fundamental trait", "Realised trait"), values = c("blue", "red")) +
-  labs(colour = "Type of response trait") +
-  ggtitle("Community mean of trait")
-  
-```
-
-Seems surprising that the fundamental niche-based response traits always (on average) provide greater explanatory power. This contradicts expectations in the Introduction section (@sec-introduction).
-
-```{r}
-#| echo: false
-#| eval: false
-expl_all_long %>%
-  filter(commstab_type == "OEV", summary_type == "RD", summary_subtype == "diss") %>%
-  ggplot(aes(x = alpha_ij_sd, y = rsq, col = trait_type)) +
-  geom_point() +
-  geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs")) +
-  xlab("Strength of interspecific interactions") +
-  ylab("Proportion of variation in community stability\nexplained by two types of response trait") +
-  scale_color_manual(labels = c("Fundamental trait", "Realised trait"), values = c("blue", "red")) +
-  labs(colour = "Type of response trait") +
-  ggtitle("Community response diversity (dissimilarity) of trait")
-  
-```
-
-```{r}
-#| echo: false
-#| eval: false
-expl_all_long %>%
-  filter(commstab_type == "OEV", summary_type == "RD", summary_subtype == "div") %>%
-  ggplot(aes(x = alpha_ij_sd, y = rsq, col = trait_type)) +
-  geom_point() +
-  geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs")) +
-  xlab("Strength of interspecific interactions") +
-  ylab("Proportion of variation in community stability\nexplained by two types of response trait") +
-  scale_color_manual(labels = c("Fundamental trait", "Realised trait"), values = c("blue", "red")) +
-  labs(colour = "Type of response trait") +
-  ggtitle("Community response diversity (divergence) of trait")
-  
-  
-```
-
-```{r}
-#| echo: false
-expl_all_long %>%
-  filter(trait_type == "fundamental") %>%
-  mutate(summary_type = paste(summary_type, summary_subtype)) %>%
-  ggplot(aes(x = alpha_ij_sd, y = rsq, col = summary_type)) +
-  facet_wrap(vars(commstab_type)) +
-  geom_point() +
-  geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs")) +
-  xlab("Strength of interspecific interactions") +
-  ylab("Proportion of variation in community stability\nexplained by two types of response trait") +
-  #scale_color_manual(labels = c("Fundamental trait", "Realised trait"), values = c("blue", "red", "black")) +
-  labs(colour = "Type of measure") +
-  ggtitle("Fundamental niche-based community measures") +
-  scale_y_continuous(breaks = seq(0, 1, 0.2))
-```
-
-```{r}
-#| echo: false
-expl_all_long %>%
-  filter(trait_type == "realised") %>%
-  mutate(summary_type = paste(summary_type, summary_subtype)) %>%
-  ggplot(aes(x = alpha_ij_sd, y = rsq, col = summary_type)) +
-  facet_wrap(vars(commstab_type)) +
-  geom_point() +
-  geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs")) +
-  xlab("Strength of interspecific interactions") +
-  ylab("Proportion of variation in community stability\nexplained by two types of response trait") +
-  #scale_color_manual(labels = c("Fundamental trait", "Realised trait"), values = c("blue", "red", "black")) +
-  labs(colour = "Type of measure") +
-  ggtitle("Realised niche-based community measures") +
-  scale_y_continuous(breaks = seq(0, 1, 0.2))
-```
-
-## Response trait and community stability
-
-In the following various graphs is the relationship between community mean of species response trait (realised or fundamental) (x-axis) and community stability (y-axis).
+In the following various graphs is the relationship between community stability (y-axis) and the mean of species responses (realised or fundamental) (x-axis) .
 
 *Each panel is for a different strength of interspecific interaction.*
 
@@ -383,63 +265,6 @@ comm_all |>
   theme(legend.position="none") +
   ggtitle("Fundamental niche-based response trait (RD_div), with OEV = sqrt(abs(comm_auc))")
 ```
-
-## Response balance
-
-Ross et al (2023) proposed that response diversity not just be measured by the spread of response trait values, but also by including if there are some negative and some positive response trait values. They made a measure, called divergence, that is zero when all response trait values are negative or all are positive, and is 1 when the most negative value is equal in magnitude to the most positive value.
-
-In the results above we see that community stability is greatest when the mean of the perturbation effect on species intrinsic growth is zero. A mean of zero results from *balance* in the negative and positive response trait values, i.e., the sum of the positive values equals the sum of the negative values.
-
-Hence, at least in the context of a pulse perturbation we see that the *response balance*, which is calculated as the mean of effects of the pulse on intrinsic growth rate, is an excellent predictor of community stability, at least when interspecific interactions are weak.
-
-We can go a little further, and predict that *response balance* (i.e., `mean_species_igr_effect` = 0) will be greatest when the **expected** temperature optima of the species is half-way between the control and perturbed temperature. This is exactly what occurs in the data, as shown in the graph just below.
-
-```{r}
-#| echo: false
-temperature_treatments <- readRDS(here("data/pack2/temperature_treatments.RDS"))
-control_temperature <- max(temperature_treatments$temperature_control)
-pulse_temperature <- min(temperature_treatments$temperature_pulse)
-mid_temperature <- (control_temperature + pulse_temperature) / 2
-
-comm_all |>
-  ggplot(aes(x = b_opt_mean, y = mean_igr_effect)) +
-  geom_point() +
-  geom_smooth() +
-  geom_vline(xintercept = mid_temperature, col = "red")
-```
-
-One set of simulations includes communities that have different values of the expected range of b_opt and show that this does not affect community stability to the pulse perturbation.
-
-```{r}
-#| echo: false
-expt_p <- readRDS(here("data", pack, "expt_communities.RDS")) |> 
-  select(-community_object)
-#community_pars_p7 <- readRDS(here("data/pack7/community_pars.RDS"))
-#dynamics <- readRDS(here("data/pack7/dynamics.RDS"))
-#species_response_traits_p7 <- readRDS(here("data/pack7/species_response_traits.RDS"))
-comm_all_p <- readRDS(here("data", pack, "community_measures.RDS")) |> 
-  full_join(expt_p)
-#expl_all_p7 <- readRDS(here("data/pack7/expl_all.RDS"))
-#comm_time_stab_p7 <- readRDS(here("data/pack7/comm_time_stab.RDS"))
-```
-
-```{r}
-comm_all_p |> 
-  ggplot(aes(x = b_opt_mean, y = comm_RR_AUC, col = b_opt_range)) +
-  geom_point() +
-  facet_wrap(vars(alpha_ij_sd))
-```
-
-```{r}
-comm_all_p |> 
-  ggplot(aes(x = b_opt_range, y = comm_RR_AUC, col = b_opt_mean)) +
-  geom_point() +
-  facet_wrap(vars(alpha_ij_sd))
-```
-
-## Some individual communities
-
-Examples 1, 2, and 3 are with no interspecific interactions. The first and second are with relatively low variation in species responses, whereare the third has higher variation (half positive and half negative). Notice how the resistance of total biomass of the third community is greater than the resistance of the first two.
 
 Examples 4 has relatively weak interspecific interaction, and example 5 has relatively strong interspecific interaction. The black boxes in some of the individual species responses are the addition of 1 abundance unit when the abundance drop too low (see last sentence in section @sec-multisppmodel).
 
@@ -611,87 +436,4 @@ comm_all |>
   geom_point() +
   facet_wrap(vars(alpha_ij_sd), nrow = 4) +
   theme(legend.position="none")
-```
-
-# From Charly
-
-```{r}
-#| eval: false
-
-Fdiv <- readRDS(here('data/merged/Fdiv_responseDiversity.RDS'))
-
-
-## overall ##
-p1<-ggplot(Fdiv, aes(x = RD_diss, y = comm_tot_deltabm, alpha = alpha_ij_sd))+
-  geom_point()+
-  theme_bw()
-
-p2<-ggplot(Fdiv, aes(x = RD_div, y = comm_tot_deltabm, alpha = alpha_ij_sd))+
-  geom_point()+
-  theme_bw()
-
-p6<-ggplot(Fdiv, aes(x = mean_igr_effect, y = comm_tot_deltabm, alpha = alpha_ij_sd))+
-  geom_point()+
-  theme_bw()
-
-p3<-ggplot(Fdiv, aes(x = fdis, y = comm_tot_deltabm, alpha = alpha_ij_sd))+
-  geom_point()+
-  theme_bw()
-
-p4<-ggplot(Fdiv, aes(x = feve, y = comm_tot_deltabm, alpha = alpha_ij_sd))+
-  geom_point()+
-  theme_bw()
-
-p5<-ggplot(Fdiv, aes(x = fric, y = comm_tot_deltabm, alpha = alpha_ij_sd))+
-  geom_point()+
-  theme_bw()
-
-(p1 + ggtitle('Fundamental niche based')) / p2 / p6
-#ggsave(plot = last_plot(), file = 'RD_Ross_etal_OEV.png', width = 10, height = 4)
-
-(p3 + ggtitle('mFD RD')) / p4 / p5
-#ggsave(plot = last_plot(), file = 'RD_mFD_OEV.png', width = 10, height = 4)
-
-### OEV ###
-p1<-ggplot(Fdiv, aes(x = RD_diss, y = OEV, alpha = alpha_ij_sd))+
-  geom_point()+
-  theme_bw()
-
-p2<-ggplot(Fdiv, aes(x = RD_div, y = OEV, alpha = alpha_ij_sd))+
-  geom_point()+
-  theme_bw()
-
-p6<-ggplot(Fdiv, aes(x = mean_igr_effect, y = OEV, alpha = alpha_ij_sd))+
-  geom_point()+
-  theme_bw()
-
-p3<-ggplot(Fdiv, aes(x = fdis, y = OEV, alpha = alpha_ij_sd))+
-  geom_point()+
-  theme_bw()
-
-p4<-ggplot(Fdiv, aes(x = feve, y = OEV, alpha = alpha_ij_sd))+
-  geom_point()+
-  theme_bw()
-
-p5<-ggplot(Fdiv, aes(x = fric, y = OEV, alpha = alpha_ij_sd))+
-  geom_point()+
-  theme_bw()
-
-(p1 + ggtitle('Fundamental niche based')) / p2 / p6
-#ggsave(plot = last_plot(), file = 'RD_Ross_etal_OEV.png', width = 10, height = 4)
-
-(p3 + ggtitle('mFD RD')) / p4 / p5
-#ggsave(plot = last_plot(), file = 'RD_mFD_OEV.png', width = 10, height = 4)
-
-
-## facets ##
-p1+facet_wrap(~alpha_ij_sd)
-p2+facet_wrap(~alpha_ij_sd)
-p6+facet_wrap(~alpha_ij_sd)
-
-p3+facet_wrap(~alpha_ij_sd)
-p4+facet_wrap(~alpha_ij_sd)
-p5+facet_wrap(~alpha_ij_sd)
-
-
 ```

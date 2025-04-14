@@ -17,7 +17,7 @@ options(dplyr.summarise.inform = FALSE)
 
 
 ## Load data ----
-#pack <- "pack2"
+#pack <- "pack1"
 expt <- readRDS(here("data", pack, "expt_communities.RDS"))
 community_pars <- readRDS(here("data", pack, "expt_communities.RDS"))
 

@@ -58,36 +58,6 @@ comm_time_stab <- tot_biomass |>
          comm_RR = (Perturbed - Control) /
            (Perturbed + Control)) 
 
-## look at pattern of NA communities
-# comms_with_nas <- comm_time_stab |> 
-#   full_join(expt) |> 
-#   group_by(case_id, alpha_ij_sd, replicate_id) |> 
-#   summarise(num = n(),
-#             num_na = sum(is.na(comm_LRR)))
-# 
-# comms_with_nas1 <- comms_with_nas |> 
-#   group_by(alpha_ij_sd, replicate_id) |> 
-#   summarise(sum(num_na < 100))
-# 
-# comms_with_nas |> 
-#   ggplot(aes(x = alpha_ij_sd, y = num_na, col = replicate_id)) +
-#   geom_jitter(position = position_jitter(width = 0.02, height = 1))
-
-
-## find communities with many NA values
-# comms_without_nas <- comm_time_stab |> 
-#   group_by(case_id) |> 
-#   summarise(num = n(),
-#             num_na = sum(is.na(comm_LRR))) |> 
-#   filter(num_na == 0) |> 
-#   pull(case_id)
-
-# comm_time_stab |>
-#   filter(case_id =="Comm-6-rep-1",
-#          # Time > 10400, Time < 10500,
-#          (Time %% keep_every_t) == 0) |> 
-#   ggplot(aes(x = Time, y = comm_deltabm)) +
-#   geom_line()
 
 ## And now across time points by auc
 comm_stab <- comm_time_stab |>
@@ -96,15 +66,6 @@ comm_stab <- comm_time_stab |>
   group_by(case_id, replicate_id) |> 
   summarise(comm_RR_AUC = my_auc_func_linear(Time, comm_RR),
             OEV = my_auc_func_linear(Time, abs(comm_RR)))
-## I would be cautious about using splines without checking they are
-## working as expected, here, and for the species level auc calculations.
-## They might be not very well constrained at the two ends of the RD axis,
-## and then make for some funking results.
-
-#test <- comm_time_stab |>
-#  filter(case_id == "Comm-10016-rep-4")
-#my_auc_func_linear(test$Time, test$comm_RR)
-
 
 ## Now the species level stabilities ----
 
@@ -119,7 +80,6 @@ tot_comm_ab <- dynamics |>
 
 ## calculate stabilities (absolute abundance)
 
-
 threshold <- other_pars$spp_RR_calc_threshold ## needed for database to have access
 species_time_stab1 <- dynamics |>
   filter((Time %% keep_every_t) == 0) |> 
@@ -130,16 +90,6 @@ species_time_stab1 <- dynamics |>
                          NA)) |> 
   select(-Control, -Perturbed) %>%
   collect() 
-
-#calculate how many species have very low / high abundance
-#dummy <- dynamics %>%
- # filter((Time %% keep_every_t) == 0) |> 
- # pivot_wider(names_from = Treatment, values_from = Abundance) |> 
- # filter(Time >490,
-  #       Control & Perturbed <10^-10) %>%
- # ungroup()%>%  
-  #mutate(spp_RR = (Perturbed - Control) / (Perturbed + Control)) %>%
-  #collect() 
 
 
 ## calculate stabilities (relative abundance)
@@ -166,28 +116,6 @@ species_time_stab2 <- temp123 %>%
 
 species_time_stab <- full_join(species_time_stab1, species_time_stab2)
 
-# temp <- species_time_stab |> 
-#   filter((Time %% keep_every_t) == 0,
-#          case_id == "Comm-1-rep-1",
-#          Species_ID == "Spp1") %>%
-#   summarise(species_RR_AUC = my_auc_func_linear(Time, spp_RR),
-#             species_delta_pi_AUC = my_auc_func_linear(Time, delta_pi))
-
-
-# comms_without_nas <- comm_time_stab |> 
-#   group_by(case_id) |> 
-#   summarise(num = n(),
-#             num_na = sum(is.na(comm_LRR))) |> 
-#   filter(num_na == 0) |> 
-#   pull(case_id)
-# 
-# 
-# temp <- species_time_stab |> 
-#   group_by(case_id, Species_ID) |> 
-#   summarise(num = n(),
-#             num_na = sum(is.na(spp_RR))) |> 
-#   filter(num_na != 0)
-# 
 
 
 species_stab <- species_time_stab |>
@@ -211,39 +139,6 @@ comm_indicies <- species_stab |>
             RD_div_species_RR_abs = resp_div(abs.RR, sign_sens = TRUE, na.rm = TRUE))
 
 
-
-
-
-## Checking out what's going on with some specific cases, mostly concerning NAs
-# case_to_check <- "Comm-1241-rep-1"
-# case_to_check <- "Comm-10036-rep-4"
-# case_to_check <- "Comm-1000-rep-1"
-# case_to_check <- "Comm-1001-rep-1"
-# case_to_check <- "Comm-1499-rep-1"
-# case_to_check <- "Comm-14174-rep-5" ## all abundances are NA
-# 
-# species_stab |> 
-#   filter(case_id == case_to_check)
-# 
-# check1 <- dynamics |>
-#   filter((Time %% keep_every_t) == 0 & case_id == case_to_check) |> 
-#   ##collect()
-#   ## remove rows where biomass is 0 in both control and treatment
-#   #filter((Con.M + Dist.M) != 0) |>
-#   pivot_wider(names_from = Treatment, values_from = Abundance) |>
-#   #mutate(spp_RR = (Perturbed - Control) / (Perturbed + Control)) |> 
-#   collect()
-# 
-# temp123 |>
-#   filter(case_id == case_to_check & Species_ID == "Spp3")
-# 
-# xxx1 <- species_time_stab |>
-#   filter(case_id == case_to_check & Species_ID == "Spp3")
-# x <- xxx1$Time
-# y <- xxx1$spp_RR
-# 
-# species_stab |> 
-#   filter(case_id == case_to_check)
 
 
 
