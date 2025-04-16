@@ -71,7 +71,7 @@ p4<-communityData %>%
 
 legend_a<-get_legend(p4)
 cowplot:: plot_grid(p2, p3,p4+theme(legend.position = 'none'),labels = c(' ', ' ', ' ', 'd)'), ncol = 3)
-ggsave(plot = last_plot(), file = here('output/Figure2_IGR_Instab.png'), width = 10.5, height = 8.5)
+ggsave(plot = last_plot(), file = here('output/Figure2_IGR_Instab.tiff'), width = 10.5, height = 8.5)
 
 
 #### Realised response traits and community stability ####
@@ -114,7 +114,7 @@ p7<-communityData %>%
   theme(legend.position = 'none')
 
 cowplot:: plot_grid(p5,p6,p7, labels = c(' ', ' ', ' '), rel_heights = c(2,2), ncol = 3)
-ggsave(plot = last_plot(), file = here('output/Figure3_Realised_Traits_Instab.png'), width = 10, height = 8)
+ggsave(plot = last_plot(), file = here('output/Figure3_Realised_Traits_Instab.tiff'), width = 10, height = 8)
 
 #### Supplementary Figures ####
 p2<-communityData %>%
